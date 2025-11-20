@@ -11,9 +11,9 @@ MacOS:
     ```brew install uv```
 
 Linux or MacOS Standalone:
-    ```curl -LsSf https://astral.sh/uv/install.sh | sh```
-or
-    ```wget -qO- https://astral.sh/uv/install.sh | sh```
+    ```curl -LsSf https://astral.sh/uv/install.sh | sh```\
+or\
+    ```wget -qO- https://astral.sh/uv/install.sh | sh```\
 
 Windows installation:
     ```powershell -c "irm https://astral.sh/uv/install.ps1 | more"```
