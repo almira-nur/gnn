@@ -1,7 +1,6 @@
 *6.7960 Final Project*
 
-Understanding the role of SE(3) equivariance for molecular energy prediction and
-creation of Machine-Learned Interatomic Potentials (MLIPs).
+Understanding the role of SO(3) equivariance for molecular energy prediction over the QM9 Dataset.
 
 This project uses uv.
 

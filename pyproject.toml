@@ -5,10 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fairchem-core>=2.11.0",
     "ipykernel>=7.1.0",
     "jupyterlab>=4.4.10",
     "rdkit>=2025.9.1",
+    "torch>=2.9.1",
     "torch-geometric>=2.7.0",
     "tqdm>=4.67.1",
 ]
