@@ -8,6 +8,8 @@ dependencies = [
     "fairchem-core>=2.11.0",
     "ipykernel>=7.1.0",
     "jupyterlab>=4.4.10",
+    "rdkit>=2025.9.1",
+    "tqdm>=4.67.1",
 ]
 
 [dependency-groups]
