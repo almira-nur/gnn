@@ -1,7 +1,7 @@
 # 6.7960 Final Project Fall 2025
 ## *Can Non-Equivariant GNNs Learn to be Equivariant From Data Alone?*
 
-Understanding the role of SO(3) equivariance for molecular Gibbs Free Energy prediction over the QM9 Dataset.
+Comparative analysis of SE(3)-equivariant and non-equivariant Graph Neural Networks for molecular property prediction on the QM7-X dataset.
 
 This project uses uv.
 
