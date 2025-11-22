@@ -246,3 +246,8 @@ desktop.ini
 *.swp
 *.swo
 *~
+
+# data
+data/*
+!data/
+
