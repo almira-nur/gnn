@@ -49,7 +49,7 @@ coverage.xml
 *.py.cover
 .hypothesis/
 .pytest_cache/
-cover/
+ccover/
 
 # Translations
 *.mo
@@ -209,3 +209,40 @@ __marimo__/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+results/models/*.pth
+results/models/*.pt
+results/models/*.ckpt
+results/figures/*.png
+results/figures/*.pdf
+results/figures/*.jpg
+results/metrics/*.csv
+results/metrics/*.json
+
+!results/models/.gitkeep
+!results/figures/.gitkeep
+!results/metrics/.gitkeep
+
+data/qm7x/*.hdf5
+data/qm7x/*.h5
+data/qm7x/*.db
+data/qm7x/*.xyz
+
+runs/
+logs/
+tensorboard/
+
+checkpoints/
+*.checkpoint
+
+*.ipynb_checkpoints
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
