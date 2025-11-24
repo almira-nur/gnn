@@ -1,0 +1,8 @@
+Do Graph Neural Networks Learn Geometry?
+
+alter
+
+
+How will we look at latent geometry?
+    - intra-orbit variance
+    - umap of embeddings
