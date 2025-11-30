@@ -10,7 +10,7 @@ N_LAYERS = 3
 #DATA_PATH = 'data/mini_10_conf_qm7x_processed.h5'
 # Uncomment for slurm
 #DATA_PATH = '/home/ptim/orcd/scratch/data/qm7x_processed.h5'
-DATA_PATH = '/home/ptim/course_projects/orcd/scratch/data/mini_10_conf_qm7x_processed.h5'
+DATA_PATH = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed.h5'
 
 CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
