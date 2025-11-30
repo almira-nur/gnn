@@ -6,11 +6,11 @@ BATCH_SIZE = 16
 LR = 1e-3
 HIDDEN_DIM = 128
 N_LAYERS = 3
-DATA_PATH = 'data/mini_10_conf_qm7x_processed.h5'
 
+#DATA_PATH = 'data/mini_10_conf_qm7x_processed.h5'
 # Uncomment for slurm
 #DATA_PATH = '/home/ptim/orcd/scratch/data/qm7x_processed.h5'
-#DATA_PATH = '/home/ptim/course_projects/gnn/data/mini_10_conf_qm7x_processed.h5'
+DATA_PATH = '/home/ptim/course_projects/orcd/scratch/data/mini_10_conf_qm7x_processed.h5'
 
 CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
