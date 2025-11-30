@@ -26,11 +26,14 @@ class EquivariantModel(nn.Module):
     def forward(self, z, pos, edge_index, batch):
         s = self.embedding(z)
         v = s.new_zeros((s.size(0), 3, self.hidden_dim))
+        
         for layer in self.layers:
             s, v = layer(s, v, pos, edge_index)
         
         per_atom_vec = self.readout(s)  # (N, 3)
-        pred = torch.scatter_add(per_atom_vec, batch, dim=0)  # (B, 3)
+        B = int(batch.to(per_atom_vec.device).max().item()) + 1
+        pred = per_atom_vec.new_zeros((B, per_atom_vec.size(1)))
+        pred.index_add_(0, batch, per_atom_vec)
         return pred
         
         
@@ -91,8 +94,12 @@ class PaiNNLayer(nn.Module):
         m_v_ij = unit.unsqueeze(-1) * m_v_ij.unsqueeze(-2)  # (E, 3, F)
     
         # Aggregate to nodes
-        m_s = torch.scatter_add(m_s_ij, i, dim=0, dim_size=s.size(0))
-        m_v = torch.scatter_add(m_v_ij, i, dim=0, dim_size=v.size(0))
+        m_s = s.new_zeros((s.size(0), self.hidden_dim))
+        m_s.index_add_(0, i, m_s_ij)
+        
+        m_v = v.new_zeros((v.size(0), 3, self.hidden_dim))
+        m_v.index_add_(0, i, m_v_ij)
+
 
         # Update
         s = s + self.U_s(m_s)
