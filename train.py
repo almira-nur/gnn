@@ -4,7 +4,7 @@ from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import DEVICE, SEED, BATCH_SIZE, LR, HIDDEN_DIM, N_LAYERS, DATA_PATH, NUM_EPOCHS, SHUFFLE
+from config.settings import DEVICE, SEED, BATCH_SIZE, LR, HIDDEN_DIM, N_LAYERS, DATA_PATH, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH
 
 
 
@@ -55,7 +55,7 @@ for epoch in range(1, NUM_EPOCHS + 1):
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': loss,
     }
-    torch.save(checkpoint, f'checkpoints/checkpoint_epoch_{epoch}.pt')
+    torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
 
     print(f"Epoch {epoch} | Loss = {loss.item():.6f}")
 
