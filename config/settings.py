@@ -7,6 +7,7 @@ LR = 1e-3
 HIDDEN_DIM = 128
 N_LAYERS = 3
 DATA_PATH = 'data/qm7x_processed.h5'
+DATA_PATH = '/home/ptim/orcd/scratch/data/qm7x_processed.h5'
 
 NUM_EPOCHS = 50
 VERBOSE = False

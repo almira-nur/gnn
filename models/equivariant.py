@@ -104,7 +104,7 @@ class PaiNNLayer(nn.Module):
 
         return s, v
 
-f
+
 
 class RBF(nn.Module):
 
@@ -113,7 +113,7 @@ class RBF(nn.Module):
         self.n_rbf = n_rbf
         self.cutoff = cutoff
 
-        self.register_buffer("freqs", torch.arange(1, n_rbf+1, dtype=torch.float32))
+        self.register_buffer("freqs", torch.arange(1, self.n_rbf+1, dtype=torch.float32))
 
     def forward(self, r):
 
