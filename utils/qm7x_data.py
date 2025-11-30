@@ -29,7 +29,7 @@ class QM7X_Dataset(Dataset):
         e = s + n
 
         data = {
-            "z":   torch.tensor(self.Z[s:e], dtype=torch.long),
+            "z":   torch.tensor(self.z[s:e], dtype=torch.long),
             "pos": torch.tensor(self.pos[s:e], dtype=torch.float32),
             "e_pbe0": torch.tensor(self.e_pbe0[idx:idx+1], dtype=torch.float32),
             "dipole": torch.tensor(self.dip[idx], dtype=torch.float32),
