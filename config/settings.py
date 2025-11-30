@@ -7,12 +7,22 @@ LR = 1e-3
 HIDDEN_DIM = 128
 N_LAYERS = 3
 
-#DATA_PATH = 'data/mini_10_conf_qm7x_processed.h5'
-# Uncomment for slurm
-#DATA_PATH = '/home/ptim/orcd/scratch/data/qm7x_processed.h5'
-DATA_PATH = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed.h5'
+#I'd just keep this true.
+SHUFFLE = True
 
-CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
+TRAIN_DATA = 'data/mini_1_conf_qm7x_processed_train.h5'
+TEST_DATA = 'data/mini_1_conf_qm7x_processed_test.h5'
+VAL_DATA = 'data/mini_1_conf_qm7x_processed_val.h5'
+
+# Uncomment for slurm
+#TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_train.h5'
+#TEST_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_test.h5'
+#VAL_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_val.h5'
+
+CHECKPOINT_PATH = 'checkpoints'
+
+# Uncomment for slurm
+#CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
 NUM_EPOCHS = 50
 VERBOSE = False
