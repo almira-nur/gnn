@@ -9,6 +9,6 @@
 #SBATCH --mail-user=ptim@mit.edu
 #SBATCH --mem=10GB
 
-uv run train.py
+uv add --no-build-isolation torch-scatter
 
-mv /home/ptim/orcd/scratch/out/uspto.smi.stereo.out_fix.txt /home/ptim/jobs/mech_data/results
+uv run train.py
