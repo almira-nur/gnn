@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torch_scatter import scatter_add
+
 
 from config.settings import HIDDEN_DIM, N_LAYERS, N_RBF, CUTOFF, DEVICE, EPSILON, EMBEDDING_SIZE
 
@@ -30,7 +30,7 @@ class EquivariantModel(nn.Module):
             s, v = layer(s, v, pos, edge_index)
         
         per_atom_vec = self.readout(s)  # (N, 3)
-        pred = scatter_add(per_atom_vec, batch, dim=0)  # (B, 3)
+        pred = torch.scatter_add(per_atom_vec, batch, dim=0)  # (B, 3)
         return pred
         
         
@@ -91,8 +91,8 @@ class PaiNNLayer(nn.Module):
         m_v_ij = unit.unsqueeze(-1) * m_v_ij.unsqueeze(-2)  # (E, 3, F)
     
         # Aggregate to nodes
-        m_s = scatter_add(m_s_ij, i, dim=0, dim_size=s.size(0))
-        m_v = scatter_add(m_v_ij, i, dim=0, dim_size=v.size(0))
+        m_s = torch.scatter_add(m_s_ij, i, dim=0, dim_size=s.size(0))
+        m_v = torch.scatter_add(m_v_ij, i, dim=0, dim_size=v.size(0))
 
         # Update
         s = s + self.U_s(m_s)

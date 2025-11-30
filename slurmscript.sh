@@ -9,6 +9,7 @@
 #SBATCH --mail-user=ptim@mit.edu
 #SBATCH --mem=10GB
 
+uv add torch
 uv add --no-build-isolation torch-scatter
 
 uv run train.py
