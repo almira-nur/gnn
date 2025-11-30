@@ -49,6 +49,13 @@ for epoch in range(1, NUM_EPOCHS + 1):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+    checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': loss,
+    }
+    torch.save(checkpoint, f'checkpoints/checkpoint_epoch_{epoch}.pt')
 
     print(f"Epoch {epoch} | Loss = {loss.item():.6f}")
 
