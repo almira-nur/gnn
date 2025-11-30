@@ -12,13 +12,14 @@ NUM_EPOCHS = 50
 VERBOSE = False
 SHUFFLE = True
 
+N_RBF = 16
+CUTOFF = 5.0 # None if no cutoff.
 
 
 
 
 
 def _resolve_device(request: str):
-    request = request.lower()
     if request == 'cpu':
         return torch.device('cpu')
     if request == 'mps':
@@ -31,8 +32,7 @@ def _resolve_device(request: str):
             return torch.device('cuda')
         except Exception:
             return torch.device('cpu')
-    # 'best' or any other
-    # Prefer CUDA, then MPS, then CPU
+
     try:
         if torch.cuda.is_available():
             return torch.device('cuda')
@@ -45,7 +45,7 @@ def _resolve_device(request: str):
         pass
     return torch.device('cpu')
 
-# Final DEVICE object used by the code
+
 DEVICE = _resolve_device(DEVICE)
 
 
