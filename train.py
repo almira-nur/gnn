@@ -1,10 +1,10 @@
 import torch
 from torch_geometric.loader import DataLoader
-from torch_geometric.utils import complete_graph
+from torch_geometric.utils import complete_graph, remove_self_loops
 from qm7x_dataset import QM7XDataset
-import models.equivariant as model_eq
+from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import *
+from config.settings import DEVICE, SEED, BATCH_SIZE, LR, HIDDEN_DIM, N_LAYERS, DATA_PATH, NUM_EPOCHS, SHUFFLE
 
 
 
@@ -14,12 +14,13 @@ dataset = QM7XDataset(DATA_PATH)
 
 train_loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=SHUFFLE)
 
-model = model_eq(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 mse = torch.nn.MSELoss()
 
 for epoch in range(1, NUM_EPOCHS + 1):
     for batch in train_loader:
+        batch = batch.to(DEVICE)
         z = batch.z
         pos = batch.pos
         dip = batch.dip
@@ -27,7 +28,8 @@ for epoch in range(1, NUM_EPOCHS + 1):
         N = pos.size(0)
         edge_index = complete_graph(N, device=DEVICE)
         mask = (b[edge_index[0]] == b[edge_index[1]])
-        edge_index = edge_index[:, mask]
+
+        edge_index, _ = remove_self_loops(edge_index[:, mask])
 
         pred = model(z=z, pos=pos, edge_index=edge_index, batch=b)
 
@@ -35,7 +37,7 @@ for epoch in range(1, NUM_EPOCHS + 1):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        
+
     print(f"Epoch {epoch} | Loss = {loss.item():.6f}")
 
 

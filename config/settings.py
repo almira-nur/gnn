@@ -15,6 +15,12 @@ SHUFFLE = True
 N_RBF = 16
 CUTOFF = 5.0 # None if no cutoff.
 
+# Max atomic number is 17 (Cl)
+EMBEDDING_SIZE = 18
+
+#Global epsilon for clamping minima to avoid division by zero.  Should never need it, and unlikely to need to change it.
+EPSILON = 1e-9
+
 
 
 
