@@ -13,6 +13,7 @@ from config.settings import (
 
 #ADAPTED FROM https://github.com/nityasagarjena/PaiNN-model
 
+#RBF expansion a la PaiNN
 def sinc_expansion(edge_dist: torch.Tensor, edge_size: int, cutoff: float):
     idx = torch.arange(edge_size, device=edge_dist.device, dtype=edge_dist.dtype) + 1
     dist = edge_dist.unsqueeze(-1).clamp_min(EPSILON)
@@ -26,6 +27,7 @@ def cosine_cutoff(edge_dist: torch.Tensor, cutoff: float):
     return cutoff_tensor
 
 
+#PaiNN message layer
 class PainnMessage(nn.Module):
     def __init__(self, node_size: int, edge_size: int, cutoff: float):
         super().__init__()
