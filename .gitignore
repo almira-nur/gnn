@@ -213,3 +213,6 @@ __marimo__/
 # data
 data/*
 !data/
+
+# checkpoints
+checkpoints/*.pt
