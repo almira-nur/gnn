@@ -12,7 +12,6 @@ dependencies = [
     "rdkit>=2025.9.1",
     "seaborn>=0.13.2",
     "torch>=2.9.1",
-    "torch-cluster>=1.6.3",
     "torch-geometric>=2.7.0",
     "tqdm>=4.67.1",
 ]
@@ -22,5 +21,3 @@ dev = [
     "ipykernel>=7.1.0",
 ]
 
-[tool.uv.extra-build-dependencies]
-torch-cluster = ["torch"]
