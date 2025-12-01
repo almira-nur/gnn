@@ -26,7 +26,7 @@ def scan(path: str):
     plt.ylabel("Count")
     plt.title(f"Dipole Histogram: {path}")
     plt.tight_layout()
-    out_path = f"{path}_dipole_hist.png".replace("/", "_")
+    out_path = f"{path}_dipole_hist.pdf".replace("/", "_")
     plt.savefig(out_path)
     plt.close()
     print(f"Saved histogram to {out_path}")

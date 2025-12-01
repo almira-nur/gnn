@@ -6,9 +6,8 @@ from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import DEVICE, SEED, BATCH_SIZE, LR, WEIGHT_DECAY, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH, CUTOFF
-
-
+from config.settings import DEVICE, SEED, BATCH_SIZE, LR, WEIGHT_DECAY, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH, CUTOFF, RESUME_PATH
+import os
 
 torch.manual_seed(SEED)
 
@@ -23,6 +22,10 @@ model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 mse = torch.nn.MSELoss()
+
+start_epoch = 1
+
+
 
 # This code should work for both the equivariant and baseline models.
 def complete_graph(num_nodes, device='cpu'):
@@ -80,10 +83,17 @@ def evaluate(loader):
     model.train()
     return sum(losses) / len(losses)
 
+if RESUME_PATH and os.path.exists(RESUME_PATH):
+    checkpoint = torch.load(RESUME_PATH, map_location=DEVICE)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+    start_epoch = checkpoint["epoch"] + 1
+    print(f"Resuming from {RESUME_PATH} (epoch {checkpoint['epoch']})")
 
 train_epoch_losses = []
 val_epoch_losses = []
-for epoch in range(1, NUM_EPOCHS + 1):
+for epoch in range(start_epoch, NUM_EPOCHS + 1):
     loss_list = []
     for batch in tqdm(train_loader):
         model.train()
