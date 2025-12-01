@@ -2,11 +2,11 @@ import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
 from torch_geometric.loader import DataLoader
-from torch_geometric.utils import remove_self_loops
+from torch_geometric.utils import radius_graph
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import DEVICE, SEED, BATCH_SIZE, LR, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH
+from config.settings import DEVICE, SEED, BATCH_SIZE, LR, WEIGHT_DECAY, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH, CUTOFF
 
 
 
@@ -20,7 +20,7 @@ val_dataset = QM7XDataset(VAL_DATA)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
-optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 mse = torch.nn.MSELoss()
 
 # This code should work for both the equivariant and baseline models.
@@ -60,8 +60,7 @@ def compute_batch_loss(batch):
 
     dip = dip.view(B, 3)
 
-    edge_index = build_block_complete_graph(b)
-    edge_index, _ = remove_self_loops(edge_index)
+    edge_index = radius_graph(pos, r=CUTOFF, batch=b, max_num_neighbors=None)
 
     pred = model(z=z, pos=pos, edge_index=edge_index, batch=b)
 
@@ -95,23 +94,21 @@ for epoch in range(1, NUM_EPOCHS + 1):
     avg_loss = sum(loss_list) / len(loss_list)
     train_epoch_losses.append(avg_loss)
     val_loss = evaluate(val_loader)
-    if val_loss is not None:
-        val_epoch_losses.append(val_loss)
+
+    val_epoch_losses.append(val_loss)
 
     checkpoint = {
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': avg_loss,
+        'val_loss': val_loss,
     }
-    if val_loss is not None:
-        checkpoint['val_loss'] = val_loss
+
     torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
 
-    if val_loss is not None:
-        print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f}")
-    else:
-        print(f"Epoch {epoch} | Loss = {avg_loss:.6f}")
+    
+    print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f}")
 
 if train_epoch_losses:
     sns.set_theme(style="darkgrid")

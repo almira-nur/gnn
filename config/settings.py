@@ -4,11 +4,17 @@ DEVICE = 'best'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
 BATCH_SIZE = 16
 LR = 1e-3
+WEIGHT_DECAY = 1e-5
 HIDDEN_DIM = 128
 N_LAYERS = 3
 
 #I'd just keep this true.
 SHUFFLE = True
+
+
+FIG_PATH = 'figures'
+# Uncomment for slurm
+#FIG_PATH = '/home/ptim/course_projects/gnn/figures'
 
 TRAIN_DATA = 'data/mini_1_conf_qm7x_processed_train.h5'
 TEST_DATA = 'data/mini_1_conf_qm7x_processed_test.h5'
@@ -69,5 +75,4 @@ def _resolve_device(request: str):
 
 
 DEVICE = _resolve_device(DEVICE)
-
 
