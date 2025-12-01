@@ -2,7 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn import radius_graph
+from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
@@ -60,7 +60,8 @@ def compute_batch_loss(batch):
 
     dip = dip.view(B, 3)
 
-    edge_index = radius_graph(pos, r=CUTOFF, batch=b, max_num_neighbors=None)
+    edge_index = build_block_complete_graph(b)
+    edge_index, _ = remove_self_loops(edge_index)
 
     pred = model(z=z, pos=pos, edge_index=edge_index, batch=b)
 
