@@ -216,3 +216,4 @@ data/*
 
 # checkpoints
 checkpoints/*.pt
+*.pt
