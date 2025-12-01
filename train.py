@@ -115,6 +115,7 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
+        'scheduler_state_dict': scheduler.state_dict(),
         'loss': avg_loss,
         'val_loss': val_loss,
     }
