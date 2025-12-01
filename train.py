@@ -2,7 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
 from torch_geometric.loader import DataLoader
-from torch_geometric.utils import radius_graph
+from torch_geometric.nn import radius_graph
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
