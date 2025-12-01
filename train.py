@@ -21,6 +21,7 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 mse = torch.nn.MSELoss()
 
 # This code should work for both the equivariant and baseline models.
@@ -95,8 +96,9 @@ for epoch in range(1, NUM_EPOCHS + 1):
     avg_loss = sum(loss_list) / len(loss_list)
     train_epoch_losses.append(avg_loss)
     val_loss = evaluate(val_loader)
-
     val_epoch_losses.append(val_loss)
+    scheduler.step()
+
 
     checkpoint = {
         'epoch': epoch,

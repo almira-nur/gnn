@@ -4,7 +4,7 @@ DEVICE = 'best'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
 BATCH_SIZE = 16
 LR = 1e-3
-WEIGHT_DECAY = 1e-5
+WEIGHT_DECAY = 1e-4
 HIDDEN_DIM = 128
 N_LAYERS = 3
 
