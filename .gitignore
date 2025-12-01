@@ -217,3 +217,4 @@ data/*
 # checkpoints
 checkpoints/*.pt
 *.pt
+mini_100_batchsize_64_hidden_dim_128/*.pt

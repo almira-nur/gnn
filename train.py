@@ -7,7 +7,7 @@ from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
 from config.settings import DEVICE, SEED, BATCH_SIZE, LR, WEIGHT_DECAY, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH, CUTOFF, RESUME_PATH
-import os
+
 
 torch.manual_seed(SEED)
 
@@ -83,7 +83,7 @@ def evaluate(loader):
     model.train()
     return sum(losses) / len(losses)
 
-if RESUME_PATH and os.path.exists(RESUME_PATH):
+if RESUME_PATH:
     checkpoint = torch.load(RESUME_PATH, map_location=DEVICE)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -93,6 +93,7 @@ if RESUME_PATH and os.path.exists(RESUME_PATH):
 
 train_epoch_losses = []
 val_epoch_losses = []
+
 for epoch in range(start_epoch, NUM_EPOCHS + 1):
     loss_list = []
     for batch in tqdm(train_loader):
