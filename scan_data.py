@@ -2,7 +2,11 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 import seaborn as sns
-from config.settings import TRAIN_DATA, VAL_DATA, TEST_DATA
+from config.settings import (
+    TRAIN_DATA, 
+    VAL_DATA, 
+    TEST_DATA,
+)
 
 def scan(path: str):
     with h5py.File(path, "r") as f:

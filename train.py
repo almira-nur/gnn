@@ -6,7 +6,23 @@ from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import DEVICE, SEED, BATCH_SIZE, LR, WEIGHT_DECAY, HIDDEN_DIM, N_LAYERS, TRAIN_DATA, VAL_DATA, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH, FIG_PATH, CUTOFF, RESUME_PATH
+from config.settings import (
+    DEVICE, 
+    SEED, 
+    BATCH_SIZE, 
+    LR, 
+    WEIGHT_DECAY, 
+    HIDDEN_DIM, 
+    N_LAYERS, 
+    TRAIN_DATA, 
+    VAL_DATA, 
+    NUM_EPOCHS, 
+    SHUFFLE, 
+    CHECKPOINT_PATH, 
+    FIG_PATH, 
+    CUTOFF, 
+    RESUME_PATH,
+)
 
 
 torch.manual_seed(SEED)

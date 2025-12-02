@@ -4,7 +4,17 @@ from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from tqdm import tqdm
-from config.settings import DEVICE, SEED, BATCH_SIZE, LR, HIDDEN_DIM, N_LAYERS, NUM_EPOCHS, SHUFFLE, CHECKPOINT_PATH
+from config.settings import (
+    DEVICE, 
+    SEED, 
+    BATCH_SIZE, 
+    LR, 
+    HIDDEN_DIM, 
+    N_LAYERS, 
+    NUM_EPOCHS, 
+    SHUFFLE, 
+    CHECKPOINT_PATH,
+)
 
 import glob
 import matplotlib.pyplot as plt
