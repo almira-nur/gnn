@@ -1,6 +1,6 @@
 import torch
 
-DEVICE = 'best'  # options: 'cpu', 'cuda', 'mps', 'best'
+DEVICE = 'cuda'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
 BATCH_SIZE = 64
 LR = 1e-3
@@ -9,30 +9,30 @@ HIDDEN_DIM = 64
 N_LAYERS = 3
 
 RESUME_PATH = None  # Path to checkpoint to resume training from, or None to start fresh.
-
+#RESUME_PATH = "/home/ptim/course_projects/gnn/checkpoints/checkpoint_epoch_18.pt"
 #I'd just keep this true.
 SHUFFLE = True
 
 
 FIG_PATH = 'figures'
 # Uncomment for slurm
-#FIG_PATH = '/home/ptim/course_projects/gnn/figures'
+FIG_PATH = '/home/ptim/course_projects/gnn/figures'
 
 TRAIN_DATA = 'data/mini_200_conf_qm7x_processed_train.h5'
 TEST_DATA = 'data/mini_200_conf_qm7x_processed_test.h5'
 VAL_DATA = 'data/mini_200_conf_qm7x_processed_val.h5'
 
 # Uncomment for slurm
-#TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_train.h5'
-#TEST_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_test.h5'
-#VAL_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_val.h5'
+TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
+TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
+VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
 
 CHECKPOINT_PATH = 'checkpoints'
 
 # Uncomment for slurm
-#CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
+CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
-NUM_EPOCHS = 50
+NUM_EPOCHS = 20
 VERBOSE = False
 SHUFFLE = True
 
