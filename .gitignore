@@ -210,6 +210,9 @@ __marimo__/
 .pixi/*
 !.pixi/config.toml
 
+# Apple files
+.DS_Store
+
 # data
 data/*
 !data/
