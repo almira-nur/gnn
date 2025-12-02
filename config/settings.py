@@ -18,9 +18,9 @@ FIG_PATH = 'figures'
 # Uncomment for slurm
 #FIG_PATH = '/home/ptim/course_projects/gnn/figures'
 
-TRAIN_DATA = 'data/mini_100_conf_qm7x_processed_train.h5'
-TEST_DATA = 'data/mini_100_conf_qm7x_processed_test.h5'
-VAL_DATA = 'data/mini_100_conf_qm7x_processed_val.h5'
+TRAIN_DATA = 'data/mini_200_conf_qm7x_processed_train.h5'
+TEST_DATA = 'data/mini_200_conf_qm7x_processed_test.h5'
+VAL_DATA = 'data/mini_200_conf_qm7x_processed_val.h5'
 
 # Uncomment for slurm
 #TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_10_conf_qm7x_processed_train.h5'
