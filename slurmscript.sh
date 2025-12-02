@@ -8,5 +8,6 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ptim@mit.edu
 #SBATCH --mem=10GB
+#SBATCH --time=06:00:00
 
 uv run train.py
