@@ -1,4 +1,5 @@
 import torch
+import os
 
 DEVICE = 'cuda'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
@@ -27,10 +28,10 @@ TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5
 TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
 VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
 
-CHECKPOINT_PATH = 'checkpoints'
 
-# Uncomment for slurm
-CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
+#CHECKPOINT_PATH = 'checkpoints'
+
+#CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
 NUM_EPOCHS = 20
 VERBOSE = False
@@ -47,7 +48,11 @@ EPSILON = 1e-9
 
 
 
+RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
 
+os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
+os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
+CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
 
 def _resolve_device(request: str):
     if request == 'cpu':

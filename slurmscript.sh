@@ -10,8 +10,10 @@
 #SBATCH --mem=10GB
 #SBATCH --time=06:00:00
 
-uv run train.py
-
 cat config/settings.py
 
 cat "$0"
+
+uv run train.py
+
+

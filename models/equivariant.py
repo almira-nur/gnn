@@ -133,6 +133,7 @@ class EquivariantModel(nn.Module):
             [PainnUpdate(hidden_dim) for _ in range(n_layers)]
         )
 
+
         self.readout = nn.Linear(hidden_dim, 3)
 
     def forward(self, z, pos, edge_index, batch):
@@ -146,6 +147,8 @@ class EquivariantModel(nn.Module):
         for msg_layer, upd_layer in zip(self.message_layers, self.update_layers):
             s, v = msg_layer(s, v, edge_index, edge_diff, edge_dist)
             s, v = upd_layer(s, v)
+    
+
 
         per_atom_vec = self.readout(s)
         B = int(batch.to(per_atom_vec.device).max().item()) + 1
