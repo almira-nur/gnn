@@ -62,6 +62,9 @@ class PainnMessage(nn.Module):
         )
         
         message_vector = node_vector[edge_index[1]] * gate_state_vector.unsqueeze(1)
+        edge_vector = gate_edge_vector.unsqueeze(1) * edge_diff.unsqueeze(-1)
+        message_vector = message_vector + edge_vector
+
 
 
         residual_scalar = torch.zeros_like(node_scalar)
@@ -110,7 +113,7 @@ class PainnUpdate(nn.Module):
         return node_scalar + delta_s, node_vector + delta_v
 
 
-class EquivariantModel(nn.Module):
+class NonEquivariantModel(nn.Module):
     def __init__(
         self,
         hidden_dim: int = HIDDEN_DIM,

@@ -5,6 +5,7 @@ from torch_geometric.loader import DataLoader
 from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
+from models.gnn_nonequivariant import NonEquivariantModel
 from tqdm import tqdm
 from config.settings import (
     DEVICE, 
