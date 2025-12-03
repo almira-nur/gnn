@@ -1,12 +1,13 @@
 import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.rotation_utils import superfib_augment_batch, superfibonacci_rotations
+from utils.rotation_utils import superfibonacci_rotations
 from torch_geometric.loader import DataLoader
 from torch_geometric.utils import remove_self_loops
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from models.gnn_nonequivariant import NonEquivariantModel
+from models.vanilla import Vanilla
 from tqdm import tqdm
 from config.settings import (
     DEVICE, 
@@ -41,7 +42,8 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 if EQUIVARIANT:
     model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 else:
-    model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    model = Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    #model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
@@ -91,7 +93,7 @@ def compute_batch_loss(batch):
     edge_index = build_block_complete_graph(b)
     edge_index, _ = remove_self_loops(edge_index)
 
-    pred = model(z=z, pos=pos, edge_index=edge_index, batch=b)
+    pred, _ = model(z=z, pos=pos, edge_index=edge_index, batch=b)
 
     loss = mse(pred, dip)
     return loss
@@ -134,7 +136,7 @@ def rotate_evaluate(loader, n_rotations=10):
                 rotated_pos = pos @ R.T
                 rotated_dip = dip @ R.T
 
-                pred = model(z=z, pos=rotated_pos, edge_index=edge_index, batch=b)
+                pred, _ = model(z=z, pos=rotated_pos, edge_index=edge_index, batch=b)
                 loss = mse(pred, rotated_dip)
                 batch_loss += loss.item()
 

@@ -1,14 +1,14 @@
 import torch
 import os
 
-DEVICE = 'cuda'  # options: 'cpu', 'cuda', 'mps', 'best'
+DEVICE = 'mps'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
 BATCH_SIZE = 64
 LR = 1e-3
 WEIGHT_DECAY = 1e-4 #L2 regularization
 HIDDEN_DIM = 64
 N_LAYERS = 3
-EQUIVARIANT = True  # Whether to use the equivariant model or the non-equivariant baseline.
+EQUIVARIANT = False  # Whether to use the equivariant model or the non-equivariant baseline.
 AUGMENT_TYPE = 'superfib_end'  # Options: 'none', 'superfib_end', 'superfib_intermediate'.  Type of data augmentation to use during training.
 N_ROTATIONS_EVALUATION = 10  # Number of rotations to average over during evaluation.
 
@@ -20,19 +20,19 @@ SHUFFLE = True
 
 FIG_PATH = 'figures'
 # Uncomment for slurm
-FIG_PATH = '/home/ptim/course_projects/gnn/figures'
+#FIG_PATH = '/home/ptim/course_projects/gnn/figures'
 
-TRAIN_DATA = 'data/mini_200_conf_qm7x_processed_train.h5'
-TEST_DATA = 'data/mini_200_conf_qm7x_processed_test.h5'
-VAL_DATA = 'data/mini_200_conf_qm7x_processed_val.h5'
+TRAIN_DATA = 'data/mini_10_conf_qm7x_processed_train.h5'
+TEST_DATA = 'data/mini_10_conf_qm7x_processed_test.h5'
+VAL_DATA = 'data/mini_10_conf_qm7x_processed_val.h5'
 
 # Uncomment for slurm
-TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
-TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
-VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
+#TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
+#TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
+#VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
 
 
-#CHECKPOINT_PATH = 'checkpoints'
+CHECKPOINT_PATH = 'checkpoints'
 
 #CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
@@ -53,9 +53,9 @@ EPSILON = 1e-9
 MODEL_NAME = 'eq' if EQUIVARIANT else 'neq'
 RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"{MODEL_NAME}_{AUGMENT_TYPE}_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
 
-os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
-os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
-CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
+#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
+#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
+#CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
 
 def _resolve_device(request: str):
     if request == 'cpu':
