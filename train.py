@@ -189,7 +189,7 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
     torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
 
     
-    print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f}")
+    print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f} | Rotated Val Loss = {rotate_val_loss:.6f}")
 
 if train_epoch_losses:
     sns.set_theme(style="darkgrid")
