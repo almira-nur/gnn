@@ -1,41 +1,42 @@
 import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from utils.rotation_utils import superfibonacci_rotations
 from torch_geometric.loader import DataLoader
 from torch_geometric.utils import remove_self_loops
+
 from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from models.gnn_nonequivariant import NonEquivariantModel
 from models.vanilla import Vanilla
+
 from tqdm import tqdm
+
 from config.settings import (
-    DEVICE, 
-    SEED, 
-    BATCH_SIZE, 
-    LR, 
-    WEIGHT_DECAY, 
-    HIDDEN_DIM, 
-    N_LAYERS, 
-    TRAIN_DATA, 
-    VAL_DATA, 
-    NUM_EPOCHS, 
-    SHUFFLE, 
-    CHECKPOINT_PATH, 
-    FIG_PATH, 
-    CUTOFF, 
+    DEVICE,
+    SEED,
+    BATCH_SIZE,
+    LR,
+    WEIGHT_DECAY,
+    HIDDEN_DIM,
+    N_LAYERS,
+    TRAIN_DATA,
+    VAL_DATA,
+    NUM_EPOCHS,
+    SHUFFLE,
+    CHECKPOINT_PATH,
+    FIG_PATH,
+    CUTOFF,
     EQUIVARIANT,
     RESUME_PATH,
     N_ROTATIONS_EVALUATION,
-    N_ROTATIONS_TRAIN
 )
-
 
 torch.manual_seed(SEED)
 
 train_dataset = QM7XDataset(TRAIN_DATA)
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=SHUFFLE)
-
 
 val_dataset = QM7XDataset(VAL_DATA)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
@@ -44,7 +45,8 @@ if EQUIVARIANT:
     model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 else:
     model = Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
-    #model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+
+# model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
@@ -52,9 +54,10 @@ mse = torch.nn.MSELoss()
 
 start_epoch = 1
 
+# ---------------------------------------------------------------------
+# Graph utilities
+# ---------------------------------------------------------------------
 
-
-# This code should work for both the equivariant and baseline models.
 def complete_graph(num_nodes, device='cpu'):
     idx = torch.arange(num_nodes, device=device)
     row = idx.repeat_interleave(num_nodes)
@@ -81,63 +84,45 @@ def build_block_complete_graph(batch_indices):
     return torch.empty((2, 0), dtype=torch.long, device=device)
 
 
-def compute_batch_loss(batch, n_rotations_train: int = 0):
-    """
-    If n_rotations_train == 0:
-        standard loss (no augmentation).
-    If n_rotations_train > 0:
-        sample n_rotations_train random rotations R,
-        rotate positions and dipoles, and average the loss over all rotations.
-    """
-    batch = batch.to(DEVICE)
-    z = batch.z          # (N_atoms,)
-    pos = batch.pos      # (N_atoms, 3)
-    dip = batch.dip      # (B, 3) or (B, 3, ?) depending on dataset; you use (B,3)
-    b = batch.batch      # (N_atoms,)
-    B = b.max().item() + 1
+# ---------------------------------------------------------------------
+# Core training utilities
+# ---------------------------------------------------------------------
 
-    dip = dip.view(B, 3)  # ensure (B,3)
+def compute_batch_loss(batch):
+    batch = batch.to(DEVICE)
+    z = batch.z
+    pos = batch.pos
+    dip = batch.dip
+    b = batch.batch
+    B = b.max().item() + 1
+    dip = dip.view(B, 3)
 
     edge_index = build_block_complete_graph(b)
     edge_index, _ = remove_self_loops(edge_index)
 
-    if n_rotations_train <= 0:
-        pred, _ = model(z=z, pos=pos, edge_index=edge_index, batch=b)
-        loss = mse(pred, dip)
-        return loss
-
-    rotations = superfibonacci_rotations(
-        n_rotations_train, device=pos.device, dtype=pos.dtype
-    )  # (K, 3, 3)
-
-    total_loss = 0.0
-    for R in rotations:
-        # Rotate both positions and dipoles:
-        rotated_pos = pos @ R.T     # (N_atoms, 3)
-        rotated_dip = dip @ R.T     # (B, 3)
-
-        pred, _ = model(z=z, pos=rotated_pos, edge_index=edge_index, batch=b)
-        total_loss = total_loss + mse(pred, rotated_dip)
-
-    # Average over rotations
-    total_loss = total_loss / n_rotations_train
-    return total_loss
+    pred, _ = model(z=z, pos=pos, edge_index=edge_index, batch=b)
+    loss = mse(pred, dip)
+    return loss
 
 
 def evaluate(loader):
     model.eval()
     losses = []
+
     with torch.no_grad():
         print("Evaluating on validation set...")
         for batch in tqdm(loader):
             loss = compute_batch_loss(batch)
             losses.append(loss.item())
+
     model.train()
     return sum(losses) / len(losses)
+
 
 def rotate_evaluate(loader, n_rotations=10):
     model.eval()
     losses = []
+
     with torch.no_grad():
         print("Evaluating on validation set with rotations...")
         for batch in tqdm(loader):
@@ -147,20 +132,21 @@ def rotate_evaluate(loader, n_rotations=10):
             dip = batch.dip
             b = batch.batch
             B = b.max().item() + 1
-
             dip = dip.view(B, 3)
 
             edge_index = build_block_complete_graph(b)
             edge_index, _ = remove_self_loops(edge_index)
 
-            # Sample quasi-uniform rotations on SO(3) to probe equivariance.
-            rotations = superfibonacci_rotations(n_rotations, device=pos.device, dtype=pos.dtype)
+            # Sample quasi-uniform rotations
+            rotations = superfibonacci_rotations(
+                n_rotations, device=pos.device, dtype=pos.dtype
+            )
 
             batch_loss = 0.0
+
             for R in rotations:
                 rotated_pos = pos @ R.T
                 rotated_dip = dip @ R.T
-
                 pred, _ = model(z=z, pos=rotated_pos, edge_index=edge_index, batch=b)
                 loss = mse(pred, rotated_dip)
                 batch_loss += loss.item()
@@ -172,13 +158,23 @@ def rotate_evaluate(loader, n_rotations=10):
     return sum(losses) / len(losses)
 
 
+# ---------------------------------------------------------------------
+# Resume checkpoint (if provided)
+# ---------------------------------------------------------------------
+
 if RESUME_PATH:
     checkpoint = torch.load(RESUME_PATH, map_location=DEVICE)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
     start_epoch = checkpoint["epoch"] + 1
+
     print(f"Resuming from {RESUME_PATH} (epoch {checkpoint['epoch']})")
+
+
+# ---------------------------------------------------------------------
+# Training loop
+# ---------------------------------------------------------------------
 
 train_epoch_losses = []
 val_epoch_losses = []
@@ -186,32 +182,26 @@ rotate_val_epoch_losses = []
 
 for epoch in range(start_epoch, NUM_EPOCHS + 1):
     loss_list = []
+
     for batch in tqdm(train_loader):
         model.train()
-        loss = compute_batch_loss(batch, n_rotations_train=N_ROTATIONS_TRAIN)
+        loss = compute_batch_loss(batch)
         loss_list.append(loss.item())
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-    
+
     avg_loss = sum(loss_list) / len(loss_list)
     train_epoch_losses.append(avg_loss)
 
-    val_loss = evaluate(val_loader)
-
-    rotate_val_loss = rotate_evaluate(
-        val_loader, n_rotations=N_ROTATIONS_EVALUATION
-    )
-    ...
-    
-    avg_loss = sum(loss_list) / len(loss_list)
-    train_epoch_losses.append(avg_loss)
     val_loss = evaluate(val_loader)
     rotate_val_loss = rotate_evaluate(val_loader, n_rotations=N_ROTATIONS_EVALUATION)
+
     val_epoch_losses.append(val_loss)
     rotate_val_epoch_losses.append(rotate_val_loss)
-    scheduler.step()
 
+    scheduler.step()
 
     checkpoint = {
         'epoch': epoch,
@@ -225,16 +215,28 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
 
     torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
 
-    
-    print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f} | Rotated Val Loss = {rotate_val_loss:.6f}")
+    print(
+        f"Epoch {epoch} | "
+        f"Train Loss = {avg_loss:.6f} | "
+        f"Val Loss = {val_loss:.6f} | "
+        f"Rotated Val Loss = {rotate_val_loss:.6f}"
+    )
+
+
+# ---------------------------------------------------------------------
+# Plot curves
+# ---------------------------------------------------------------------
 
 if train_epoch_losses:
     sns.set_theme(style="darkgrid")
     epochs = list(range(1, len(train_epoch_losses) + 1))
+
     plt.figure(figsize=(8, 4))
     sns.lineplot(x=epochs, y=train_epoch_losses, marker='o', label='Train Loss')
+
     if val_epoch_losses and len(val_epoch_losses) == len(train_epoch_losses):
         sns.lineplot(x=epochs, y=val_epoch_losses, marker='o', label='Val Loss')
+
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Training Loss Curve")
@@ -245,8 +247,15 @@ if train_epoch_losses:
 if rotate_val_epoch_losses:
     sns.set_theme(style="darkgrid")
     epochs = list(range(1, len(rotate_val_epoch_losses) + 1))
+
     plt.figure(figsize=(8, 4))
-    sns.lineplot(x=epochs, y=rotate_val_epoch_losses, marker='o', label='Rotated Val Loss')
+    sns.lineplot(
+        x=epochs,
+        y=rotate_val_epoch_losses,
+        marker='o',
+        label='Rotated Val Loss'
+    )
+
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Rotated Validation Loss Curve")
