@@ -1,41 +1,67 @@
 import torch
-from utils.rotation_utils import superfib_augment_batch
+from torch_geometric.utils import remove_self_loops
+from utils.rotation_utils import superfibonacci_rotations
 
-# Here, we will compute
-# 1) A trace of the MSE between y and each rotation
-# 2) The average rotation error through an entire orbit 
 
-def get_orbit_variance(model, pos, z, y, k):
-    device = model.device
+def _complete_graph(num_nodes: int, device):
+    idx = torch.arange(num_nodes, device=device)
+    row = idx.repeat_interleave(num_nodes)
+    col = idx.repeat(num_nodes)
+    edge_index = torch.stack([row, col], dim=0)
+    edge_index, _ = remove_self_loops(edge_index)
+    return edge_index
 
-    assert model.device == pos.device and model.device == z.device, "Model device doesn't match pos device!"
-    assert model.device == z.device, "Model device doesn't match z device!"
-    assert model.device == y.device, "Model device doesn't match z device!"
+
+def get_orbit_variance(model, pos, z, y, k: int):
+    """
+    Measure equivariance for a *single molecule* under k rotations.
+
+    model : Vanilla (or similar) GNN
+    pos   : (N, 3) atom positions (for ONE molecule)
+    z     : (N,) atomic numbers
+    y     : (3,) dipole vector for that molecule
+    k     : number of superfibonacci rotations
+    """
+    device = next(model.parameters()).device
+
+    pos = pos.to(device)
+    z   = z.to(device)
+    y   = y.to(device)
+
+    # 🔍 Sanity check: we expect a 3D vector (dipole)
+    if y.numel() != 3:
+        raise ValueError(
+            f"get_orbit_variance expects y with 3 elements (dipole), "
+            f"but got {y.numel()} elements. Did you pass the right target?"
+        )
+
+    y = y.view(1, 3)   # (1,3)
 
     N = pos.size(0)
     batch = torch.zeros(N, dtype=torch.long, device=device)
-    y = torch.zeros(1, device=device)
+    edge_index = _complete_graph(N, device=device)
 
-    pos_aug, z_aug, y_aug, batch_aug = superfib_augment_batch(
-        pos, z, y, batch, k, device=device
-    )
+    R = superfibonacci_rotations(k, device=device, dtype=pos.dtype)  # (k,3,3)
 
-    # each augmentation corresponds to one molecule
-    y_pred = []
-    
+    preds = []
+    targets = []
 
-    for i in range(k):
-        mask = (batch_aug == i)
-        pos_i = pos_aug[mask]
-        z_i   = z_aug[mask]
-        batch_i = torch.zeros_like(z_i)
+    model.eval()
+    with torch.no_grad():
+        for i in range(k):
+            Ri = R[i]             # (3,3)
+            pos_rot = pos @ Ri.T  # (N,3)
+            y_rot = (y @ Ri.T)    # (1,3)
 
-        y_pred.append(model(pos_i, z_i, batch_i))
+            pred, _ = model(z=z, pos=pos_rot, edge_index=edge_index, batch=batch)
+            preds.append(pred.squeeze(0))      # (3,)
+            targets.append(y_rot.squeeze(0))   # (3,)
 
-    y_pred = torch.stack(y_pred)
+    preds = torch.stack(preds, dim=0)      # (k,3)
+    targets = torch.stack(targets, dim=0)  # (k,3)
 
-    mse_per_rotation = (y_pred - y.squeeze())**2 #MSE per rotation
-    orbit_variance = y_pred.var(unbiased=False).item() #Variance of predictions
+    mse_per_rotation = ((preds - targets) ** 2).mean(dim=1)  # (k,)
+    orbit_variance = preds.var(dim=0, unbiased=False).mean().item()
     mean_mse = mse_per_rotation.mean().item()
 
     return mse_per_rotation, orbit_variance, mean_mse

@@ -42,6 +42,4 @@ def scan(path: str):
     mse_mean = np.mean(np.sum((dip - mean_vec)**2, axis=1))
     print(f"Predict-mean baseline -> mean vector {mean_vec}, MSE {mse_mean:.6f}")
 
-
-
 scan(TRAIN_DATA)
