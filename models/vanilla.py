@@ -82,7 +82,8 @@ class Vanilla_Layer(nn.Module):
         row, col = edge_index 
 
         # 1. FLATTEN THE VECTORS
-        # v shape: (N, 3, F) -> (N, 3*F)
+        # v shape: (N, 3, F) -> (N, 3*F) maybe F is 1
+        #print(f"v shape before flattening: {v.shape}")
         # This treats spatial geometry as just "more features"
         v_flat = v.reshape(v.size(0), -1) 
         

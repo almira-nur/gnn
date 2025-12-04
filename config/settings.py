@@ -3,7 +3,7 @@ import os
 
 DEVICE = 'mps'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
-BATCH_SIZE = 64
+BATCH_SIZE = 256
 LR = 1e-3
 WEIGHT_DECAY = 1e-4 #L2 regularization
 HIDDEN_DIM = 64

@@ -154,4 +154,4 @@ class EquivariantModel(nn.Module):
         B = int(batch.to(per_atom_vec.device).max().item()) + 1
         pred = per_atom_vec.new_zeros((B, per_atom_vec.size(1)))
         pred.index_add_(0, batch, per_atom_vec)
-        return pred
+        return pred, ''

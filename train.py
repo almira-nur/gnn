@@ -10,7 +10,8 @@ from qm7x_dataset import QM7XDataset
 from models.equivariant import EquivariantModel
 from models.gnn_nonequivariant import NonEquivariantModel
 from models.vanilla import Vanilla
-
+from models.chocolate import Chocolate
+from models.strawberry import Strawberry
 from tqdm import tqdm
 
 from config.settings import (
@@ -44,9 +45,10 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 if EQUIVARIANT:
     model = EquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 else:
-    model = Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
-
-# model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    model = Chocolate(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    #model = Strawberry(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    #model = Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
+    #model = NonEquivariantModel(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
@@ -118,8 +120,7 @@ def evaluate(loader):
     model.train()
     return sum(losses) / len(losses)
 
-
-def rotate_evaluate(loader, n_rotations=10):
+def rotate_evaluate(loader, n_rotations=N_ROTATIONS_EVALUATION):
     model.eval()
     losses = []
 
@@ -157,10 +158,37 @@ def rotate_evaluate(loader, n_rotations=10):
     model.train()
     return sum(losses) / len(losses)
 
+def equivariance_error(loader, n_rotations=N_ROTATIONS_EVALUATION):
+    model.eval()
+    errors = []
+    with torch.no_grad():
+        print("Computing equivariance error on validation set...")
+        for batch in tqdm(loader):
+            batch = batch.to(DEVICE)
+            z = batch.z
+            pos = batch.pos
+            b = batch.batch
+            B = b.max().item() + 1
 
-# ---------------------------------------------------------------------
-# Resume checkpoint (if provided)
-# ---------------------------------------------------------------------
+            edge_index = build_block_complete_graph(b)
+            edge_index, _ = remove_self_loops(edge_index)
+
+            # Sample quasi-uniform rotations on SO(3) to probe equivariance.
+            rotations = superfibonacci_rotations(n_rotations, device=pos.device, dtype=pos.dtype)
+
+            for R in rotations:
+                rotated_pos = pos @ R.T
+
+                pred, _ = model(z=z, pos=pos, edge_index=edge_index, batch=b)
+                rotated_pred, _ = model(z=z, pos=rotated_pos, edge_index=edge_index, batch=b)
+
+                rotated_pred_expected = pred @ R.T
+
+                error = torch.mean(torch.norm(rotated_pred - rotated_pred_expected, dim=1)).item()
+                errors.append(error)
+
+    model.train()
+    return sum(errors) / len(errors)
 
 if RESUME_PATH:
     checkpoint = torch.load(RESUME_PATH, map_location=DEVICE)
@@ -215,17 +243,8 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
 
     torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
 
-    print(
-        f"Epoch {epoch} | "
-        f"Train Loss = {avg_loss:.6f} | "
-        f"Val Loss = {val_loss:.6f} | "
-        f"Rotated Val Loss = {rotate_val_loss:.6f}"
-    )
-
-
-# ---------------------------------------------------------------------
-# Plot curves
-# ---------------------------------------------------------------------
+    
+    print(f"Epoch {epoch} | Train Loss = {avg_loss:.6f} | Val Loss = {val_loss:.6f} | Rotated Val Loss = {rotate_val_loss:.6f} | Equivariance Error = {equivariance_error(val_loader, n_rotations=N_ROTATIONS_EVALUATION):.6f}")
 
 if train_epoch_losses:
     sns.set_theme(style="darkgrid")
