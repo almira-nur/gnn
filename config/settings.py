@@ -1,9 +1,9 @@
 import torch
 import os
 
-DEVICE = 'mps'  # options: 'cpu', 'cuda', 'mps', 'best'
+DEVICE = 'cuda'  # options: 'cpu', 'cuda', 'mps', 'best'
 SEED = 42
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 LR = 1e-3
 WEIGHT_DECAY = 1e-4 #L2 regularization
 HIDDEN_DIM = 64
@@ -23,19 +23,19 @@ FIG_PATH = 'figures'
 # Uncomment for slurm
 #FIG_PATH = '/home/ptim/course_projects/gnn/figures'
 
-TRAIN_DATA = 'data/mini_10_conf_qm7x_processed_train.h5'
-TEST_DATA = 'data/mini_10_conf_qm7x_processed_test.h5'
-VAL_DATA = 'data/mini_10_conf_qm7x_processed_val.h5'
+TRAIN_DATA = 'data/mini_200_conf_qm7x_processed_train.h5'
+TEST_DATA = 'data/mini_200_conf_qm7x_processed_test.h5'
+VAL_DATA = 'data/mini_200_conf_qm7x_processed_val.h5'
 
 # Uncomment for slurm
-#TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
-#TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
-#VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
+TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
+TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
+VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
 
 
 CHECKPOINT_PATH = 'checkpoints'
 
-#CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
+CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
 NUM_EPOCHS = 20
 VERBOSE = False

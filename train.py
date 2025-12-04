@@ -212,14 +212,14 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
     avg_loss = sum(loss_list) / len(loss_list)
     train_epoch_losses.append(avg_loss)
 
-    train_eval_loss = evaluate(train_loader, name="train (eval)")
-    train_eval_epoch_losses.append(train_eval_loss)
+#    train_eval_loss = evaluate(train_loader, name="train (eval)")
+#    train_eval_epoch_losses.append(train_eval_loss)
 
     val_loss = evaluate(val_loader, name="validation")
-    rotate_val_loss = rotate_evaluate(val_loader, n_rotations=N_ROTATIONS_EVALUATION)
+#    rotate_val_loss = rotate_evaluate(val_loader, n_rotations=N_ROTATIONS_EVALUATION)
 
     val_epoch_losses.append(val_loss)
-    rotate_val_epoch_losses.append(rotate_val_loss)
+#    rotate_val_epoch_losses.append(rotate_val_loss)
 
     scheduler.step()
 
@@ -229,9 +229,9 @@ for epoch in range(start_epoch, NUM_EPOCHS + 1):
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
         'loss': avg_loss,
-        'train_eval_loss': train_eval_loss,
+#        'train_eval_loss': train_eval_loss,
         'val_loss': val_loss,
-        'rotate_val_loss': rotate_val_loss,
+#        'rotate_val_loss': rotate_val_loss,
     }
 
     torch.save(checkpoint, f'{CHECKPOINT_PATH}/checkpoint_epoch_{epoch}.pt')
