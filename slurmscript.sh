@@ -14,6 +14,8 @@ cat config/settings.py
 
 cat "$0"
 
+
+
 uv run train.py
 
 
