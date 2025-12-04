@@ -8,7 +8,7 @@ LR = 1e-3
 WEIGHT_DECAY = 1e-4 #L2 regularization
 HIDDEN_DIM = 64
 N_LAYERS = 3
-EQUIVARIANT = False  # Whether to use the equivariant model or the non-equivariant baseline.
+MODEL_TYPE = 'chocolate'  # options: 'vanilla', 'chocolate', 'strawberry'
 AUGMENT_TYPE = 'superfib_end'  # Options: 'none', 'superfib_end', 'superfib_intermediate'.  Type of data augmentation to use during training.
 N_ROTATIONS_EVALUATION = 10  # Number of rotations to average over during evaluation.
 N_ROTATIONS_TRAIN = 4 #0 means no augmentation
@@ -51,8 +51,7 @@ EMBEDDING_SIZE = 18
 EPSILON = 1e-9
 
 
-MODEL_NAME = 'eq' if EQUIVARIANT else 'neq'
-RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"{MODEL_NAME}_{AUGMENT_TYPE}_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
+RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"_{MODEL_TYPE}_{AUGMENT_TYPE}_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
 
 #os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
 #os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)

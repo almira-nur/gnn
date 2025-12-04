@@ -8,6 +8,10 @@ from config.settings import (
     EPSILON,
 )
 
+#
+# Equivariant Model
+#
+
 class Chocolate(nn.Module):
     def __init__(self, hidden_dim = HIDDEN_DIM, n_layers = N_LAYERS):
         super().__init__()
