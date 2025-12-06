@@ -47,12 +47,12 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 match MODEL_TYPE:
     case 'vanilla':
-        model = torch.compile(Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE))
+        model = Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
     case 'chocolate':
-        model = torch.compile(Chocolate(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE))
+        model = Chocolate(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 
     case 'strawberry':
-        model = torch.compile(Strawberry(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE))
+        model = Strawberry(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS).to(DEVICE)
 
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
