@@ -31,7 +31,7 @@ class Vanilla(nn.Module):
 
         for layer in self.layers:
             x, v = layer(x, v, edge_index)
-            intermediates.append((x, v))
+            intermediates.append(v)
         
         # 1. Flatten (N, 3, F) -> (N, 3*F) so global_pool sees it as "just features"
         n_nodes, _, f_dim = v.shape

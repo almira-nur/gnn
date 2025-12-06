@@ -12,6 +12,7 @@ MODEL_TYPE = 'chocolate'  # options: 'vanilla', 'chocolate', 'strawberry'
 AUGMENT_TYPE = 'superfib_end'  # Options: 'none', 'superfib_end', 'superfib_intermediate'.  Type of data augmentation to use during training.
 N_ROTATIONS_EVALUATION = 10  # Number of rotations to average over during evaluation.
 N_ROTATIONS_TRAIN = 4 #0 means no augmentation
+LAMBDA_CONSISTENCY = 0.1  # Weight for equivariance layerwise consistency loss term during training when using data augmentation.
 
 RESUME_PATH = None  # Path to checkpoint to resume training from, or None to start fresh.
 #RESUME_PATH = "/home/ptim/course_projects/gnn/checkpoints/checkpoint_epoch_18.pt"
