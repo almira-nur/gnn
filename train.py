@@ -121,7 +121,7 @@ match AUGMENT_TYPE:
     case 'superfib_intermediate':
         def _rotate_vector(v, R):
             v = v.view(v.size(0), 3, -1)
-            return torch.matmul(R, v.transpose(1, 2)).transpose(1, 2)
+            return torch.einsum('ij,njk->nik', R, v)
 
         def compute_batch_loss(batch):
             batch = batch.to(DEVICE)
