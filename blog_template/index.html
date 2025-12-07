@@ -325,16 +325,87 @@ A single layer of Chocolate maps
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo><mo>↦</mo><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo></mrow>
 </math>.  Given a node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math> with adjacent node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>j</mi></math>, the layer computes:
+<ol>
+<li>The direction of the neighboring node and its distance:</li>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>𝐫</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>=</mo><msub><mi>𝐫</mi><mpadded lspace="0"><mi mathvariant="normal">j</mi></mpadded></msub><mo>−</mo><msub><mi>𝐫</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded></msub></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>d</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>=</mo><msub><mrow><mo fence="true" form="prefix">‖</mo><msub><mi>𝐫</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo fence="true" form="postfix">‖</mo></mrow><mn>2</mn></msub></mrow></math>
+	</center>
+	<br>
+	<center></center>
+
+<li> Concatenates scalar features to form message input:</li>
+<br>
 	<center>
 	<mstyle displaystyle="true">
 	<math xmlns="http://www.w3.org/1998/Math/MathML">
-		<msub><mi>r</mi><mo>ij</mo></msub>
+		<msub><mi>m</mi><mo>ij</mo></msub>
 		<mo>=</mo>
-		<msub><mi>r</mi><mo>ij</mo></msub><mo>-</mo><msub><mi>r</mi><mo>j</mo></msub><mo>;</mo>
-		<msub><mi>d</mi><mrow><mi>ij</mi></mrow></msub><mo>=</mo><mo>‖</mo><msub><mi>r</mi><mo>ij</mo></msub><msub><mo>‖</mo><mn>2</mn></msub>
+		<msub><mo>MLP</mo><mo>msg</mo></msub><mo>(</mo><mrow><msubsup><mi>x</mi><mrow><mo>i</mo></mrow><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow>
+		<mo>,</mo>
+		<mrow><msubsup><mi>x</mi><mrow><mo>j</mo></mrow><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow>
+		<mo>,</mo>
+		<mrow><msub><mi>d</mi><mrow><mi>ij</mi></mrow></msub></mrow>
+		<mo>)</mo>
 	</math>
 	</mstyle>
 	</center>
+	<br>
+<center></center>
+
+<li> Splits the output of the message MLP into vector gates and scalar messages:</li>
+<br>
+	<center>
+	<mstyle displaystyle="true">
+	<math xmlns="http://www.w3.org/1998/Math/MathML">
+		<mo>(</mo><mrow><msub><mi>g</mi><mo>ij</mo></msub><mo>,</mo><msub><mi>s</mi><mo>ij</mo></msub></mrow><mo>)</mo>
+		<mo>=</mo>
+		<mo>split</mo><mo>(</mo><msub><mi>m</mi><mo>ij</mo></msub><mo>)</mo>
+	</math>
+	</mstyle>
+	</center>
+		<br>
+<center></center>
+<li> Calculates the vector message:</li>
+<br>
+	<center>
+	<mstyle displaystyle="true">
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>vec</mtext></msubsup><mo>=</mo><msub><mover><mi>𝐫</mi><mo stretchy="false" class="wbk-acc" style="math-depth:0;">^</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>⊗</mo><msub><mi>g</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub></mrow></math></mstyle>
+	</center>
+		<br>
+<center></center>
+<li> Aggregates the messages:</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>agg</mi><mi>x</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msub><mi>s</mi><mrow><mi>ij</mi></mrow></msub></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>agg</mi><mi>𝐯</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msub><mi>m</mi><mrow><mi>ij</mi></mrow></msub></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li>Mixes the hidden channels of the vector features (applies a single linear layer):</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mtext>mix</mtext></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><msub><mi>W</mi><mtext>mix</mtext></msub></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li> And finally applies the updates:</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>+</mo><msub><mpadded lspace="0"><mi>MLP</mi></mpadded><mtext>upd</mtext></msub><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo separator="true">,</mo><msub><mpadded lspace="0"><mi>agg</mi></mpadded><mi>x</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>+</mo><msub><mpadded lspace="0"><mi>agg</mi></mpadded><mi>𝐯</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>+</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mtext>mix</mtext></msubsup></mrow></math>
+	</center>
+</ol>
 Where <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi><mo>e</mo></math> is an edge message MLP, and
 
 		
