@@ -321,7 +321,31 @@ We defined an equivariant GNN, "Chocolate", inspired by the EGNN architecture <a
 and a non-equivariant GNN, "Strawberry", meant to serve as a control, with similar architecture to Chocolate but
 lacking equivariant operations.
 
-A single layer of Chocolate maps 
+
+</div>
+		    <div class="margin-right-block">
+						
+		    </div>
+		</div>
+	
+	<div class="content-margin-container" id="methods">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+						<h1>Methods</h1>
+			
+			For a simple prediction task on molecular data sensitive to 3D geometry, we chose to predict the vector 
+			molecular dipole moment for small molecules from the QM7x dataset <a href="#ref_2">[2]</a>.
+			This dataset contains $\sim$7,000 small molecules with up to 7 "heavy" (non-hydrogen) atoms each, in various
+			conformations. We treated each molecule as a point cloud with labeled atom types.  The coordinates of
+			molecules in QM7x are centered.  
+			For each structure with $N$ atoms, we built all $N^2 - N$ directed edges $(i, j)$ where 
+			$i \neq j$. Each node was featurized with a learned scalar embedding of the atom type from the set 
+			(H, C, N, O, F, P, S, Cl). Each edge $(i, j)$ was featurized with the distance between atoms $i$ and $j$. 
+			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
+			respectively, ensuring that different conformations of the same molecule were all in the same split.
+			For tractability in training, we randomly downsampled the training set to 200 conformers per each molecule.
+			A single layer of Chocolate maps 
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo><mo>↦</mo><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo></mrow>
 </math>.  Given a node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math> with adjacent node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>j</mi></math>, the layer computes:
@@ -336,7 +360,10 @@ A single layer of Chocolate maps
 		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>d</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>=</mo><msub><mrow><mo fence="true" form="prefix">‖</mo><msub><mi>𝐫</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo fence="true" form="postfix">‖</mo></mrow><mn>2</mn></msub></mrow></math>
 	</center>
 	<br>
-	<center></center>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mover><mi>𝐫</mi><mo stretchy="false" class="wbk-acc" style="math-depth:0;">^</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>=</mo><mstyle displaystyle="true" scriptlevel="0"><mfrac><msub><mi>𝐫</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><msub><mi>d</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub></mfrac></mstyle></mrow></math>
+	</center>
+	<br>
 
 <li> Concatenates scalar features to form message input:</li>
 <br>
@@ -406,32 +433,97 @@ A single layer of Chocolate maps
 		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>+</mo><msub><mpadded lspace="0"><mi>agg</mi></mpadded><mi>𝐯</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>+</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mtext>mix</mtext></msubsup></mrow></math>
 	</center>
 </ol>
-Where <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi><mo>e</mo></math> is an edge message MLP, and
 
+The equivariance of this model is guaranteed by the use of relative position vectors <math><msub><mover><mi>𝐫</mi><mo stretchy="false" class="wbk-acc" style="math-depth:0;">^</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded></msub></math>.  
+Because these vectors only depend on the relative positions of atoms, any transform that preserves the molecular
+geometry, i.e., these vectors will rotate with any transformation from SO(3).
+
+Strawberry, however, uses a slightly different layer architecture.  As input, instead of zero initialization, as is used
+in Chocolate, information about the molecular geometry is given through using atomic position vectors as the vector
+features of the first layer:<br><br>
+<center>
+	<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mn>0</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msub><mi>𝐫</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded></msub><mo>⊗</mo><msub><mn>𝟏</mn><mi>F</mi></msub></mrow></math>
+</center>
+<br>
+Where, as before, <math><mi>F</mi></math> is the hidden
+dimension. A single layer of Strawberry:
+
+<ol>
+<li>Computes a "pseudo-position" and "pseudo-distance" from the current vector features:</li>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mover><mi>𝐫</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><mstyle displaystyle="true" scriptlevel="0"><mfrac><mn>1</mn><mi>F</mi></mfrac></mstyle><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>F</mi></munderover></mrow><msubsup><mi>𝐯</mi><mrow><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mo separator="true">,</mo><mo lspace="0.2222em" rspace="0.2222em">:</mo><mo separator="true">,</mo><mpadded lspace="0"><mi mathvariant="normal">k</mi></mpadded></mrow><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mover><mi>𝐫</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mover><mi>𝐫</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">j</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>−</mo><msubsup><mover><mi>𝐫</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mover><mi>d</mi><mo stretchy="false" class="chr-lrg wbk-lrg" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msub><mrow><mo fence="true" form="prefix">‖</mo><msubsup><mover><mi>𝐫</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo fence="true" form="postfix">‖</mo></mrow><mn>2</mn></msub></mrow></math>
+	</center>
+	<br>
+
+<li> Creates a flattened representation <math><msubsup><mover><mi>𝐯</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup></math> of the vector features and concatenates it with the scalar features:</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mover><mi>𝐯</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><mpadded lspace="0"><mi>flatten</mi></mpadded><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>u</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo separator="true">,</mo><msubsup><mover><mi>𝐯</mi><mo stretchy="false" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+	<br>
+<center></center>
+<li> Computes messages with an MLP:</li>
+<br>
+<center>
+	<math><mrow><msub><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo>=</mo><msub><mpadded lspace="0"><mi>MLP</mi></mpadded><mtext>msg</mtext></msub><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>u</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo separator="true">,</mo><msubsup><mi>u</mi><mpadded lspace="0"><mi mathvariant="normal">j</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo separator="true">,</mo><msubsup><mover><mi>d</mi><mo stretchy="false" class="chr-lrg wbk-lrg" style="math-depth:0;">~</mo></mover><mpadded lspace="0"><mi>ij</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+</center>
+<br>
+<li> Splits the output of the message MLP into vector gates and scalar messages:</li>
+<br>
+	<center>
+		<math><mrow><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>scalar</mtext></msubsup><mo separator="true">,</mo><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>flat</mtext></msubsup><mo fence="true" form="postfix">)</mo></mrow><mo>=</mo><mpadded lspace="0"><mi>split</mi></mpadded><mrow><mo fence="true" form="prefix">(</mo><msub><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded></msub><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li> Reshapes the vector message:</li>
+<br>
+	<center>
+		<math><mrow><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>vec</mtext></msubsup><mo>=</mo><mpadded lspace="0"><mi>reshape</mi></mpadded><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>flat</mtext></msubsup><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li> Aggregates the messages:</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>agg</mi><mi>x</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>scalar</mtext></msubsup></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msub><mi>agg</mi><mi>𝐯</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msubsup><mi>m</mi><mpadded lspace="0"><mi>ij</mi></mpadded><mtext>vec</mtext></msubsup></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li>Mixes the hidden channels of the vector features (applies a single linear layer):</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mtext>mix</mtext></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><msub><mi>W</mi><mtext>mix</mtext></msub></mrow></math>
+	</center>
+		<br>
+<center></center>
+<li> And finally applies the updates:</li>
+<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>+</mo><msub><mpadded lspace="0"><mi>MLP</mi></mpadded><mtext>upd</mtext></msub><mrow><mo fence="true" form="prefix">(</mo><msubsup><mi>x</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow class="tml-sml-pad"><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo separator="true">,</mo><msub><mpadded lspace="0"><mi>agg</mi></mpadded><mi>x</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo fence="true" form="postfix">)</mo></mrow></mrow></math>
+	</center>
+	<br>
+	<center>
+		<math display="block" class="tml-display" style="display:block math;"><mrow><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mrow><mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo><mi>l</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo></mrow></msubsup><mo>+</mo><msub><mpadded lspace="0"><mi>agg</mi></mpadded><mi>𝐯</mi></msub><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false">)</mo><mo>+</mo><msubsup><mi>𝐯</mi><mpadded lspace="0"><mi mathvariant="normal">i</mi></mpadded><mtext>mix</mtext></msubsup></mrow></math>
+	</center>
+</ol>
 		
-</div>
-		    <div class="margin-right-block">
-						
-		    </div>
-		</div>
-	
-	<div class="content-margin-container" id="methods">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h1>Methods</h1>
-			
-			For a simple prediction task on molecular data sensitive to 3D geometry, we chose to predict the vector 
-			molecular dipole moment for small molecules from the QM7x dataset <a href="#ref_2">[2]</a>.
-			This dataset contains $\sim$7,000 small molecules with up to 7 "heavy" (non-hydrogen) atoms each, in various
-			conformations. We treated each molecule as a point cloud with labeled atom types.  The coordinates of
-			molecules in QM7x are centered.  
-			For each structure with $N$ atoms, we built all $N^2 - N$ directed edges $(i, j)$ where 
-			$i \neq j$. Each node was featurized with a learned scalar embedding of the atom type from the set 
-			(H, C, N, O, F, P, S, Cl). Each edge $(i, j)$ was featurized with the distance between atoms $i$ and $j$. 
-			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
-			respectively, ensuring that different conformations of the same molecule were all in the same split.
-			For tractability in training, we randomly downsampled the training set to 200 conformers per each molecule.
 			<center>
 			<math xmlns="http://www.w3.org/1998/Math/MathML">
 				<mrow>
