@@ -222,15 +222,10 @@
           <div style="position:fixed; max-width:inherit; top:max(20%,120px)">
               <b style="font-size:16px">Outline</b><br><br>
               <a href="#intro">Introduction</a><br><br>
-<<<<<<< HEAD
               <a href="#background">Background</a><br><br>
 			  <a href="#methods">Methods</a><br><br>
 			  <a href="#evaluation">Evaluation</a><br><br>
 			  <a href="#conclusion">Conclusion</a><br><br>
-=======
-			  <a href="#methods">Methods</a><br><br>
-              <a href="#does_x_do_y">Does X do Y?</a><br><br>
->>>>>>> df51a10969652842089b14e59ba775ce6fd800e0
               <a href="#implications_and_limitations">Implications and limitations</a><br><br>
           </div>
 				</div>
@@ -249,7 +244,7 @@
 		    <div class="main-content-block">
 						<h2>Introduction</h2>
 						A Graph Neural Network is one of the most naturally suitable networks to represent molecular data, where a node corresponds to an atom and an edge corresponds to a chemical bond. Because of this structural alignment, there has been immense research done on using GNN to work with molecular data in various applications like property prediction, organic retrosynthesis, and protein-ligand binding. However, by default GNNs do not inherently encode one of central properties of molecules - rotational and translational (SE(3)) equivariance. 
-
+			
 To address this limitation, a number of architectures with built-in equivariance have been proposed such as PaiNN, SchNet, EGNN. Despite achieving better performance and more meaningful and accurate physical representation, built-in equivariant GNNs are computationally expensive as they often rely on spherical harmonics algorithms. 
 
 This raises an important question of effectiveness and design trade-off; could a carefully designed non-equivariant GNN, trained on synthetically augmented data, learn equivariance and achieve similar results, while requiring less computations? To investigate this hypothesis, we designed a set of models to predict dipole moment of small organic molecules from QM7-X dataset.
@@ -264,9 +259,67 @@ To evaluate the effectiveness of equivariance learning we compared these three c
 
 
 Background
-            		    </div>
+
+We formulated two simple GNN models — Strawberry and Chocolate — to examine how models could learn equivariance.  We
+treat a molecule as a tuple <math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">M</mi></math>:
+
+<center>
+<!-- Molecule definition -->
+	<mstyle displaystyle="true">
+	<math xmlns="http://www.w3.org/1998/Math/MathML">
+		<mi mathvariant="bold">M</mi>
+		<mo>=</mo>
+		<mrow>
+		<mo>(</mo>
+		<mi>V</mi><mo>,</mo>
+		<mi>E</mi><mo>,</mo>
+		<mi>z</mi><mo>,</mo>
+		<mi mathvariant="bold">r</mi><mo>,</mo>
+		<mi mathvariant="bold">μ</mi>
+		<mo>)</mo>
+		</mrow>
+		</math>
+	</mstyle>
+</center>
+Where <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>V</mi></math> are the set of nodes (atoms), 
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>E</mi></math> are the set of edges, and since we are treating 
+molecules as point clouds and there are no self-edges, there are <math xmlns="http://www.w3.org/1998/Math/MathML"><msup>
+<mi>N</mi><mn>2</mn></msup><mo>−</mo><mn>N</mn></math> edges; <math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>z</mi><mi>i</mi></msub></math> are the node labels (atomic identities); <math xmlns="http://www.w3.org/1998/Math/MathML">
+<mi mathvariant="bold">r</mi><mo>=</mo><mrow><mo>{</mo><msub><mi>r</mi><mi>i</mi></msub><mo>}</mo></mrow></math> are the 3D coordinates of each atom; and
+<math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">μ</mi></math> is the calculated vector dipole moment of the molecule.
+For a rotation <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math> in SO(3), the rotated molecule is given by:
+	<center>
+	<mstyle displaystyle="true">
+	<math xmlns="http://www.w3.org/1998/Math/MathML">
+		<mi>R</mi><mo>·</mo>
+		<mi mathvariant="bold">M</mi>
+		<mo>=</mo>
+		<mo>(</mo>
+		<mi>V</mi><mo>,</mo>
+		<mi>E</mi><mo>,</mo>
+		<mi>z</mi><mo>,</mo>
+		<mi>R</mi><mi mathvariant="bold">r</mi><mo>,</mo>
+		<mi>R</mi><mi mathvariant="bold">μ</mi>
+		<mo>)</mo>
+		</math>
+	</center>
+	The model <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi></math> is equivariant with respect to SO(3) if:
+<center>
+	<mstyle displaystyle="true">
+	<math xmlns="http://www.w3.org/1998/Math/MathML">
+		<mo>∀</mo><mi>R</mi><mo>∈</mo><mi>SO</mi><mo>(</mo><mn>3</mn><mo>)</mo><mo>,</mo>
+		<mi>f</mi><mo>(</mo><mi>z</mi><mo>,</mo><mi>R</mi><mi mathvariant="bold">r</mi><mo>,</mo><mi>E</mi><mo>)</mo>
+		<mo>=</mo>
+		<mi>R</mi>
+		<mi>f</mi><mo>(</mo><mi>z</mi><mo>,</mo><mi mathvariant="bold">r</mi><mo>,</mo><mi>E</mi><mo>)</mo>
+	</math>
+	</mstyle>
+</center>
+
+	</div>
 		    <div class="margin-right-block">
-						We chose to 
+						
 		    </div>
 		</div>
 	
@@ -279,13 +332,15 @@ Background
 			For a simple prediction task on molecular data sensitive to 3D geometry, we chose to predict the vector 
 			molecular dipole moment for small molecules from the QM7x dataset <a href="#ref_2">[2]</a>.
 			This dataset contains $\sim$7,000 small molecules with up to 7 "heavy" (non-hydrogen) atoms each, in various
-			conformations. For each structure with $N$ atoms, we built all $N^2 - N$ directed edges $(i, j)$ where 
+			conformations. We treated each molecule as a point cloud with labeled atom types.  The coordinates of
+			molecules in QM7x are centered.  
+			For each structure with $N$ atoms, we built all $N^2 - N$ directed edges $(i, j)$ where 
 			$i \neq j$. Each node was featurized with a learned scalar embedding of the atom type from the set 
 			(H, C, N, O, F, P, S, Cl). Each edge $(i, j)$ was featurized with the distance between atoms $i$ and $j$. 
 			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
 			respectively, ensuring that different conformations of the same molecule were all in the same split.
 			For tractability in training, we randomly downsamples the training set to 200 conformers per each molecule.
-			
+			<center>
 			<math xmlns="http://www.w3.org/1998/Math/MathML">
 				<mrow>
 					<!-- L_layer(x; R) = -->
@@ -367,6 +422,7 @@ Background
 				</mrow>
 			</math>
 			</div>
+			</center>
 		    <div class="margin-right-block">
 						Margin note that clarifies some detail #main-content-block for intro section.
 		    </div>
