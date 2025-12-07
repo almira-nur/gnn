@@ -222,6 +222,7 @@
           <div style="position:fixed; max-width:inherit; top:max(20%,120px)">
               <b style="font-size:16px">Outline</b><br><br>
               <a href="#intro">Introduction</a><br><br>
+			  <a href="#methods">Methods</a><br><br>
               <a href="#does_x_do_y">Does X do Y?</a><br><br>
               <a href="#implications_and_limitations">Implications and limitations</a><br><br>
           </div>
@@ -243,6 +244,108 @@
             Motivate your project. What question are you asking. Why is it unanswered so far? What gap in the literature or practice are you filling?
             Why is it important?
 		    </div>
+		    <div class="margin-right-block">
+						Margin note that clarifies some detail #main-content-block for intro section.
+		    </div>
+		</div>
+	
+	<div class="content-margin-container" id="methods">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+						<h1>Methods</h1>
+			
+			For a simple prediction task on molecular data sensitive to 3D geometry, we chose to predict the vector 
+			molecular dipole moment for small molecules from the QM7x dataset <a href="#ref_2">[2]</a>.
+			This dataset contains $\sim$7,000 small molecules with up to 7 "heavy" (non-hydrogen) atoms each, in various
+			conformations. For each structure with $N$ atoms, we built all $N^2 - N$ directed edges $(i, j)$ where 
+			$i \neq j$. Each node was featurized with a learned scalar embedding of the atom type from the set 
+			(H, C, N, O, F, P, S, Cl). Each edge $(i, j)$ was featurized with the distance between atoms $i$ and $j$. 
+			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
+			respectively, ensuring that different conformations of the same molecule were all in the same split.
+			For tractability in training, we randomly downsamples the training set to 200 conformers per each molecule.
+			
+			<math xmlns="http://www.w3.org/1998/Math/MathML">
+				<mrow>
+					<!-- L_layer(x; R) = -->
+					<msub>
+					<mi>L</mi>
+					<mtext>layer</mtext>
+					</msub>
+					<mo>(</mo>
+					<mi>x</mi>
+					<mo>;</mo>
+					<mi>R</mi>
+					<mo>)</mo>
+					<mo>=</mo>
+
+					<!-- 1 / L -->
+					<mfrac>
+					<mn>1</mn>
+					<mi>L</mi>
+					</mfrac>
+
+					<!-- sum_{ell=1}^L -->
+					<mrow>
+					<mo>&#x2211;</mo>
+					<mrow>
+						<mi>&#x2113;</mi>
+						<mo>=</mo>
+						<mn>1</mn>
+					</mrow>
+					<mi>L</mi>
+					</mrow>
+
+					<!-- * 1 / N -->
+					<mfrac>
+					<mn>1</mn>
+					<mi>N</mi>
+					</mfrac>
+
+					<!-- sum_{i=1}^N -->
+					<mrow>
+					<mo>&#x2211;</mo>
+					<mrow>
+						<mi>i</mi>
+						<mo>=</mo>
+						<mn>1</mn>
+					</mrow>
+					<mi>N</mi>
+					</mrow>
+
+					<!-- || v_ell(R x)_i - R v_ell(x)_i ||_2 -->
+					<mrow>
+					<mo>&#x2225;</mo>
+					<mrow>
+						<msub>
+						<mi>v</mi>
+						<mrow>
+							<mi>&#x2113;</mi>
+							<mo>(</mo>
+							<mi>R</mi><mi>x</mi>
+							<mo>)</mo>
+						</mrow>
+						</msub>
+						<mo>(</mo><mi>i</mi><mo>)</mo>
+						<mo>&#x2212;</mo>
+						<mi>R</mi>
+						<msub>
+						<mi>v</mi>
+						<mrow>
+							<mi>&#x2113;</mi>
+							<mo>(</mo>
+							<mi>x</mi>
+							<mo>)</mo>
+						</mrow>
+						</msub>
+						<mo>(</mo><mi>i</mi><mo>)</mo>
+					</mrow>
+					<mo>&#x2225;</mo>
+					<msub><mi></mi><mn>2</mn></msub>
+					</mrow>
+				</mrow>
+			</math>
+			</div>
 		    <div class="margin-right-block">
 						Margin note that clarifies some detail #main-content-block for intro section.
 		    </div>
