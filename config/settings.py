@@ -54,9 +54,9 @@ EPSILON = 1e-9
 
 RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"_{MODEL_TYPE}_{AUGMENT_TYPE}_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
 
-#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
-#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
-#CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
+os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
+os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
+CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
 
 def _resolve_device(request: str):
     if request == 'cpu':
