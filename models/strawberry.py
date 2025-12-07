@@ -2,12 +2,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import global_add_pool
-# Assuming config settings are available
 from config.settings import (
     HIDDEN_DIM,
     N_LAYERS,
     EMBEDDING_SIZE,
 )
+
+#
+# Non-Equivariant Model
+#
+
 
 class Strawberry(nn.Module):
     def __init__(self, hidden_dim = HIDDEN_DIM, n_layers = N_LAYERS):
@@ -28,12 +32,12 @@ class Strawberry(nn.Module):
         x = self.embedding(z)  # (N, F)
         v = pos.unsqueeze(-1).expand(-1, 3, self.hidden_dim)
         
-        # Intermediates storage can be kept or removed based on need
+        # Collect intermediates for layerwise loss
         intermediates = [] 
 
         for layer in self.layers:
             x, v = layer(x, v, edge_index)
-            intermediates.append((x, v))
+            intermediates.append(v)
         
         # 1. Flatten (N, 3, F) -> (N, 3*F)
         n_nodes, _, f_dim = v.shape
@@ -121,7 +125,7 @@ class Strawberry_Layer(nn.Module):
         x_update_input = torch.cat([x, agg_s], dim=-1)
         x_new = x + self.scalar_update_mlp(x_update_input)
         
-        # Calculate v_mix (maintains structural term from Chocolate)
+        # A la Chocolate
         v_mix = torch.einsum('nik,kh->nih', v, self.vector_mix.weight)
         
         # Update vector features (v)

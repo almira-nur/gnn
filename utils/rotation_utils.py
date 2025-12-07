@@ -81,23 +81,7 @@ def rotate_positions(pos, R):
 
 
 def superfib_augment_batch(pos, z, y, batch, k, device=None):
-    """
-    Apply k Super-Fibonacci SO(3) rotations to a PyG-style batch.
-
-    Inputs:
-        pos:   (N_atoms, 3)
-        z:     (N_atoms,) or (N_atoms, Fz)
-        y:     (B,) or (B,1)
-        batch: (N_atoms,) in [0, B-1]
-        k:     number of rotations
-        device: torch.device or None
-
-    Returns:
-        pos_out:   (k*N_atoms, 3)
-        z_out:     (k*N_atoms,) or (k*N_atoms, Fz)
-        y_out:     (k*B,) or (k*B,1)
-        batch_out: (k*N_atoms,) in [0, k*B - 1]
-    """
+    
     if device is None:
         device = pos.device
 
