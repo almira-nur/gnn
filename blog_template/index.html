@@ -317,6 +317,13 @@ For a rotation <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math
 	</mstyle>
 </center>
 
+We defined an equivariant GNN, "Chocolate", inspired by the EGNN architecture <a href="#ref_2">[2]</a>,
+and a non-equivariant GNN, "Strawberry", meant to serve as a control, with similar architecture to Chocolate but
+lacking equivariant operations.
+
+A single layer of Chocolate: <math xmlns="http://www.w3.org/1998/Math/MathML">
+		<mo>(</mo><msup><mi>x</mi><mo>(</mo><mi>l</mi><mo>)</mo></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>,</mo><mi>E</mi><mo>)</mo>
+
 	</div>
 		    <div class="margin-right-block">
 						
@@ -339,7 +346,7 @@ For a rotation <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math
 			(H, C, N, O, F, P, S, Cl). Each edge $(i, j)$ was featurized with the distance between atoms $i$ and $j$. 
 			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
 			respectively, ensuring that different conformations of the same molecule were all in the same split.
-			For tractability in training, we randomly downsamples the training set to 200 conformers per each molecule.
+			For tractability in training, we randomly downsampled the training set to 200 conformers per each molecule.
 			<center>
 			<math xmlns="http://www.w3.org/1998/Math/MathML">
 				<mrow>
