@@ -321,10 +321,24 @@ We defined an equivariant GNN, "Chocolate", inspired by the EGNN architecture <a
 and a non-equivariant GNN, "Strawberry", meant to serve as a control, with similar architecture to Chocolate but
 lacking equivariant operations.
 
-A single layer of Chocolate: <math xmlns="http://www.w3.org/1998/Math/MathML">
-		<mo>(</mo><msup><mi>x</mi><mo>(</mo><mi>l</mi><mo>)</mo></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>,</mo><mi>E</mi><mo>)</mo>
+A single layer of Chocolate maps 
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo><mo>↦</mo><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo></mrow>
+</math>.  Given a node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math> with adjacent node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>j</mi></math>, the layer computes:
+	<center>
+	<mstyle displaystyle="true">
+	<math xmlns="http://www.w3.org/1998/Math/MathML">
+		<msub><mi>r</mi><mo>ij</mo></msub>
+		<mo>=</mo>
+		<msub><mi>r</mi><mo>ij</mo></msub><mo>-</mo><msub><mi>r</mi><mo>j</mo></msub><mo>;</mo>
+		<msub><mi>d</mi><mrow><mi>ij</mi></mrow></msub><mo>=</mo><mo>‖</mo><msub><mi>r</mi><mo>ij</mo></msub><msub><mo>‖</mo><mn>2</mn></msub>
+	</math>
+	</mstyle>
+	</center>
+Where <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi><mo>e</mo></math> is an edge message MLP, and
 
-	</div>
+		
+</div>
 		    <div class="margin-right-block">
 						
 		    </div>
