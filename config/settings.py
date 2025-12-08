@@ -29,14 +29,14 @@ TEST_DATA = 'data/mini_200_conf_qm7x_processed_test.h5'
 VAL_DATA = 'data/mini_200_conf_qm7x_processed_val.h5'
 
 # Uncomment for slurm
-TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
-TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
-VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
+#TRAIN_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_train.h5'
+#TEST_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_test.h5'
+#VAL_DATA = '/home/ptim/orcd/scratch/data/mini_200_conf_qm7x_processed_val.h5'
 
 
 CHECKPOINT_PATH = 'checkpoints'
 
-CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
+#CHECKPOINT_PATH = '/home/ptim/course_projects/gnn/checkpoints'
 
 NUM_EPOCHS = 20
 VERBOSE = False
@@ -54,11 +54,11 @@ EPSILON = 1e-9
 
 RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"_{MODEL_TYPE}_{AUGMENT_TYPE}_hd{HIDDEN_DIM}_nl{N_LAYERS}_bs{BATCH_SIZE}_lr{LR}"
 
-os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
-os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
-os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures', exist_ok=True)
-FIG_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures'
-CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
+#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
+#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
+#os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures', exist_ok=True)
+#FIG_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures'
+#CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
 
 def _resolve_device(request: str):
     if request == 'cpu':
