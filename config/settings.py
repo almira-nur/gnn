@@ -8,8 +8,8 @@ LR = 1e-3
 WEIGHT_DECAY = 1e-4 #L2 regularization
 HIDDEN_DIM = 64
 N_LAYERS = 3
-MODEL_TYPE = 'chocolate'  # options: 'vanilla', 'chocolate', 'strawberry'
-AUGMENT_TYPE = 'none'  # Options: 'none', 'superfib_end', 'superfib_intermediate'.  Type of data augmentation to use during training.
+MODEL_TYPE = 'strawberry'  # options: 'vanilla', 'chocolate', 'strawberry'
+AUGMENT_TYPE = 'superfib_intermediate'  # Options: 'none', 'superfib_end', 'superfib_intermediate'.  Type of data augmentation to use during training.
 N_ROTATIONS_EVALUATION = 10  # Number of rotations to average over during evaluation.
 N_ROTATIONS_TRAIN = 4 #0 means no augmentation
 LAMBDA_CONSISTENCY = 0.1  # Weight for equivariance layerwise consistency loss term during training when using data augmentation.
@@ -56,6 +56,8 @@ RUN_NAME = TRAIN_DATA.rsplit("/", 1)[-1].rsplit(".", 1)[0] + f"_{MODEL_TYPE}_{AU
 
 os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}', exist_ok=True)
 os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints', exist_ok=True)
+os.makedirs(f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures', exist_ok=True)
+FIG_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/figures'
 CHECKPOINT_PATH = f'/home/ptim/course_projects/gnn/{RUN_NAME}/checkpoints'
 
 def _resolve_device(request: str):

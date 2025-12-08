@@ -3,8 +3,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH -N 1
 #SBATCH -n 2
-#SBATCH -J Train_Chocolate
-#SBATCH --output=/home/ptim/orcd/scratch/out/Train_Chocolate_%j.log
+#SBATCH -J Train_Strawberry_Intermediate_Aug
+#SBATCH --output=/home/ptim/orcd/scratch/out/Train_Strawberry_Intermediate_Aug_%j.log
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ptim@mit.edu
 #SBATCH --mem=20GB
