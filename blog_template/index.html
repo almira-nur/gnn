@@ -231,6 +231,19 @@
 				</div>
 		    <div class="main-content-block">
 						<h2>Introduction</h2>
+		
+<!-- 
+A note here, it is not generally true that equivariant
+ neural networks rely on spherical harmonics.  EGNN,
+ which inspired the structure of Chocolate, does not, for example.
+ https://arxiv.org/pdf/2102.09844
+ Also, "less computations" needs to be rigorously defined.
+ Are you talking about less compute during training time,
+ inference, or something else?  If we need to do data augmentation,
+ that means that the compute during training increases O(N)
+ where N is the number of augmentations.
+
+-->
 						A Graph Neural Network is one of the most naturally suitable networks to represent molecular data, where a node corresponds to an atom and an edge corresponds to a chemical bond. Because of this structural alignment, there has been immense research done on using GNN to work with molecular data in various applications like property prediction, organic retrosynthesis, and protein-ligand binding. However, by default GNNs do not inherently encode one of central properties of molecules - rotational and translational (SE(3)) equivariance.
 To address this limitation, a number of architectures with built-in equivariance have been proposed such as PaiNN, SchNet, EGNN. Despite achieving better performance and more meaningful and accurate physical representation, built-in equivariant GNNs are computationally expensive as they often rely on spherical harmonics algorithms.
 This raises an important question of effectiveness and design trade-off; could a carefully designed non-equivariant GNN, trained on synthetically augmented data, learn equivariance and achieve similar results, while requiring less computations? To investigate this hypothesis, we designed a set of models to predict dipole moment of small organic molecules from QM7-X dataset.
@@ -240,6 +253,8 @@ To evaluate the effectiveness of equivariance learning we compared these three c
 2. Strawberry - a standard, non-equivariant GNN, which has the same architecture as vanilla model, that was trained on
 3. Chocolate - our built-in equivariant GNN that
 Background
+
+<br><br>
 We formulated two simple GNN models — Strawberry and Chocolate — to examine how models could learn equivariance.  We
 treat a molecule as a tuple <math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">M</mi></math>:
 <!-- Molecule definition -->
@@ -437,6 +452,11 @@ Adding this loss term is tantamount to adding an extra objective.  To avoid the 
 by predicting a trivial dipole (the zero vector) that perfectly satisfies equivariance, we scale this additional loss
 term by a hyperparameter $LAMBDA$.  For future implementations of such a layerwise loss, we will perform a
 hyperparameter search to find optimal values of lambda.
+<h3>Sampling SO(3)</h3>
+To efficiently generate samples of SO(3) rotation matrices, we implemented the superfibonacci sampling algorithm.[ref]
+
+
+<h3>Evaluation</h3>
 			</div>
 			<div class="margin-right-block">
 						Margin note that clarifies some detail #main-content-block for intro section.
@@ -448,7 +468,11 @@ hyperparameter search to find optimal values of lambda.
 		    <div class="main-content-block">
 					<h1>Does Strawberry learn to be equivariant?</h1>
 					Non-equivariant models with sufficient expressivity and information about geometry are known to be
-					capable of learning equivariance.
+					capable of learning equivariance.  This both follows from universal approximation [LEHSNO 1993] and has been shown
+					in applications.[REF = LEARNED EQUIVARIANCE].  To evaluate whether Strawberry was able to converge
+					to equivariance with normal, data-augmented, and our layerwise loss regimes, we calculated the
+					cosine similarity of predicted dipoles and intermediate representations over a random sample of
+					molecules with [N] rotations applied to them.
 				<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
               <mrow>
                 <mrow>
@@ -478,9 +502,10 @@ hyperparameter search to find optimal values of lambda.
 				<div class="margin-left-block">
 				</div>
 		    <div class="main-content-block">
-					<h1>Do layerwise losses help?</h1>
-					Implementing layerwise losses add a hard equivariance objective for the non-equivariant model.
-					Data augmentation alone provides a soft objective in favor of equivariance.
+					<h1>Do layerwise losses help generalization?</h1>
+					To evaluate whether including the layerwise losses enhanced the model's ability to generalize to 
+					out of distribution data, we performed the same analysis as in the previous section on molecules
+					from the [XYZ] dataset.
           <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
               <mrow>
                 <mrow>
