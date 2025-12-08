@@ -312,7 +312,6 @@
 						<h2>Introduction</h2>
 
 						<p>
-<<<<<<< HEAD
 							A Graph Neural Network is one of the most naturally suitable architectures to represent molecular data,
 							 where a node corresponds to an atom and an edge corresponds to a chemical bond. 
 							Because of this structural alignment, there has been immense research done on using GNN 
@@ -321,19 +320,10 @@
 							inherently encode and guarantee one of the central properties of molecules - 
 							rotational and translational (SE(3)) equivariance. Although scalar observable only require 
 							for the model ot be invariant to rotation and translation, vector quantities require
-=======
-							A Graph Neural Network (GNN) is one of the most naturally suitable networks to represent 
-							molecular data, where a node corresponds to an atom and an edge corresponds to a chemical 
-							bond. Because of this structural alignment, there has been immense research done on using 
-							GNNs to work with molecular data in various applications like property prediction, organic 
-							retrosynthesis, and protein–ligand binding. However, by default GNNs do not inherently 
-							encode one of the central properties of molecules – rotational and translational (SE(3)) 
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 							equivariance.
 						</p>
 
 						<p>
-<<<<<<< HEAD
 							To address this limitation, a number of architectures with built-in equivariance have 
 							been proposed such as PaiNN, SchNet, EGNN. Despite achieving better performance and more 
 							meaningful and accurate physical representation, built-in equivariant GNNs are 
@@ -381,56 +371,6 @@
 								which would increase computational cost by substantial amount, but rather on adding new 
 								information in form of vector features to each node. It was inspired by PaiNN and EGNN 
 								architectures that are described below. 
-=======
-							To address this limitation, a number of architectures with built-in equivariance have been 
-							proposed such as PaiNN, SchNet, and EGNN. Despite achieving better performance and more 
-							meaningful and accurate physical representation, built-in equivariant GNNs are 
-							computationally expensive, often relying on spherical harmonics or per-edge vector updates.
-						</p>
-
-						<p>
-							This raises an important question of effectiveness and design trade-off: could a carefully 
-							designed non-equivariant GNN, trained on synthetically augmented data, learn equivariance 
-							and achieve similar results while requiring fewer computations? To investigate this 
-							hypothesis, we designed a set of models to predict the dipole moment of small organic 
-							molecules from the QM7-X dataset, avoiding models that rely on spherical harmonics due to 
-							their higher computational complexity.
-						</p>
-
-						<p>
-							Dipole moment prediction is a particularly suitable benchmark for this case as it is a 
-							3D-vector quantity; as a molecule gets rotated, the output should rotate in the same 
-							direction while retaining magnitude.
-						</p>
-
-						<p>
-	Our central hypothesis is that a non-equivariant GNN trained with sufficiently diverse rotational augmentation can 
-	approximate SE(3) equivariance closely enough to perform competitively with an explicitly equivariant architecture, 
-	at reduced computational cost.
-</p>
-
-						<br/>
-
-						<p>To evaluate the effectiveness of equivariance learning we compared these three cases:</p>
-
-						<ol>
-							<li>
-								<b>Vanilla</b> – a standard, non-equivariant GNN that was trained on the original 
-								dataset without rotational augmentation.
-							</li>
-							<br/>
-							<li>
-								<b>Strawberry</b> – a standard, non-equivariant GNN, which has the same architecture as 
-								the Vanilla model, trained on data augmentation. We used superfibonacci sampling to 
-								obtain rotated data from our training dataset.
-							</li>
-							<br/>
-							<li>
-								<b>Chocolate</b> – our built-in equivariant GNN that was designed such that internal 
-								vector features are guaranteed to rotate with rotation of the input. It does not rely on
-								 spherical harmonics, which would substantially increase computational cost, but instead
-								  adds vector features to each node, similar in spirit to PaiNN and EGNN.
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 							</li>
 						</ol>
 
@@ -456,42 +396,15 @@
 
 						<h3>Latent Space</h3>
 						<p>
-<<<<<<< HEAD
 							Deep learning models for molecules operate by mapping molecular structures into a latent
 							space, where each node and edge is represented by learned features.</p>
-=======
-							Deep learning models for molecules operate by mapping molecular structures into a latent 
-							space, where each node and edge is represented by learned features. For a GNN, we typically 
-							distinguish between scalar node features
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>h</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>d</mi></msup></math>
-							and vector features
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">v</mi><mo>∈</mo><msup><mi>ℝ</mi><mn>3</mn></msup></math>.
-							Scalar features encode information like atom type or charge, while vector features encode 
-							directional or geometric information tied to 3D space.
-						</p>
-						<p>
-							In non-equivariant GNNs, the geometry of this latent space does not necessarily transform 
-							consistently under rotations of the input. In contrast, equivariant GNNs constrain vector 
-							features so that when the input coordinates are rotated by a rotation matrix
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi><mo>∈</mo><mi>SO</mi><mo>(</mo><mn>3</mn><mo>)</mo></math>,
-							the corresponding vector features transform as
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">v</mi><mo>↦</mo><mi>R</mi><mi mathvariant="bold">v</mi></math>.
-							This structured latent space is crucial for correctly modeling vector-valued properties such as dipole moments.
-						</p>
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 
 						<h3>Equivariance</h3>
 
 						<p>
-<<<<<<< HEAD
 						Let's define invariance and equivariance. Suppose we have
 						a function <em>f</em> and a transformation <em>g</em>. Then <em>f</em> is
 						invariant to <em>g</em> if
-=======
-							We formulated two simple GNN models — Strawberry and Chocolate — to examine how models could
-							 learn equivariance. We treat a molecule as a tuple
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">M</mi></math>:
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						</p>
 
 						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -510,12 +423,6 @@
 						and <em>f</em> is equivariant to <em>g</em> if
 						</p>
 
-<<<<<<< HEAD
-=======
-						<p>For a rotation <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math> in SO(3), 
-							the rotated molecule is:</p>
-
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
 						<mrow>
 							<mi>f</mi>
@@ -596,34 +503,9 @@
 							<mo>)</mo>
 							</mrow>
 						</math>
-<<<<<<< HEAD
 						</div>
 						Keep in mind that since 3D coordinates and dipole moment are 3D vector quantities, 
 						we need to make sure that ground truth dipole moment gets rotated as well as the input molecule as you can see above.
-=======
-
-						<p>
-							A model
-							<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi></math>
-							is equivariant with respect to SO(3) if:
-						</p>
-
-						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-							<mo>∀</mo><mi>R</mi><mo>∈</mo><mi>SO</mi><mo>(</mo><mn>3</mn><mo>)</mo><mo>,</mo>
-							<mi>f</mi><mo>(</mo><mi>z</mi><mo>,</mo><mi>R</mi><mi mathvariant="bold">r</mi><mo>,</mo><mi>E</mi><mo>)</mo>
-							<mo>=</mo>
-							<mi>R</mi>
-							<mi>f</mi><mo>(</mo><mi>z</mi><mo>,</mo><mi mathvariant="bold">r</mi><mo>,</mo><mi>E</mi><mo>)</mo>
-						</math>
-
-						<p>
-							We defined an equivariant GNN, "Chocolate", inspired by the EGNN architecture 
-							<a href="#ref_2">[2]</a>, and a non-equivariant GNN, "Strawberry", serving as a control with
-							 a similar architecture but lacking equivariant operations. Vanilla serves as a simpler 
-							 non-equivariant baseline without rotational augmentation.
-						</p>
-
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 		    </div>
 		    <div class="margin-right-block">
 		    </div>
@@ -636,24 +518,16 @@
 						<h2>Related Works</h2>
 						<p>
 							There have been many attempts to learn the best representation of molecular data for better 
-<<<<<<< HEAD
 							convergence, including string-based approaches (e.g. SMILES) and fingerprint-based approaches 
 							(e.g. ECFP, Morgan Fingerprints). However, these methods tend to lose structural information of 
 							molecules, which limits number of tasks neural networks could achieve with molecular data. 
 							This limitation drove the improvement of GNN-based models that operate directly on atomic 
 							graphs embedded in 3D space. 
-=======
-							convergence, including string-based approaches (e.g., SMILES) and fingerprint-based 
-							approaches (e.g., ECFP, Morgan Fingerprints). However, these approaches tend to lose 
-							structural and geometric information of molecules, especially in 3D, which motivates the use
-							 of GNNs over molecular graphs embedded in space.
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						</p>
 						<h3>Rotational and Translational Invariance based GNN models</h3>
 
 						<h4>SchNet</h4>
 						<p>
-<<<<<<< HEAD
 							This deep learning architecture uses continuous-filter convolution layers, rather than message passing 
 							algorithms. Continious-filter convolution layer make it feasible to work with molecules 
 							scattered in 3D space, rather than classic grid view layers. The filter is implemented as a 
@@ -663,61 +537,21 @@
 						<p>
 							However, SchNet cannot be used to predict vector quantities, as it only guarantees translational 
 							and rotational invariance, but not equivariance.
-=======
-							This deep learning architecture uses continuous-filter convolution layers, rather than 
-							classic message passing algorithms. Continuous-filter convolution layers make it feasible to
-							 work with molecules scattered in 3D space, rather than classic grid-based convolution. The 
-							 filter is implemented as a neural network; that is, it is a function, not a fixed kernel, 
-							 that takes a displacement vector and outputs a learned weight. For efficiency, the 
-							 operation is applied per feature channel.
-						</p>
-						<p>
-							However, SchNet cannot be used to predict vector quantities, as it only guarantees 
-							translational and rotational invariance, not equivariance. It outputs scalar invariant 
-							features that are well-suited for scalar properties such as energy, but cannot directly 
-							represent properties like forces or dipole moments.
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						</p>
 
 						<h4>Equivariant Graph Neural Network (EGNN)</h4>
 						<p>
-<<<<<<< HEAD
 							This deep learning architecture solves the SE(3) equivariance problem, while additionally 
 							introducing reflection equivariance, which makes the architecture E(n) equivariant. It 
 							involves more extended message passing that includes both scalar and vector features, 
 							turning the architecture suitable to predict dipole moment as well. Although the algorithm 
 							does not rely on spherical harmonics, it is more expressive than invariant SchNet, which 
 							comes with higher computational cost due to computing vector updates per edge.
-=======
-							EGNN is a deep learning architecture that solves the SE(3) equivariance problem while 
-							additionally introducing reflection equivariance, which makes the architecture 
-							E(n)-equivariant. It updates both scalar and vector features and uses relative positions to 
-							maintain equivariance. Although the algorithm does not rely on spherical harmonics, it is 
-							more expressive than invariant architectures like SchNet, which comes with higher 
-							computational cost due to computing vector updates per edge.
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						</p>
 
 						<h4>Polarizable Interaction Neural Network (PaiNN)</h4>
 						<p>
-<<<<<<< HEAD
 							It is a tensor-based SE(3)-equivariant network designed as a successor of SchNet.
-=======
-							PaiNN is a tensor-based SE(3)-equivariant network designed as a successor of SchNet. 
-							It introduces explicit vector features and uses them to propagate directional information 
-							through the model. PaiNN is designed to be more efficient than spherical harmonics-based 
-							models while still enforcing equivariance constraints. However, maintaining and updating 
-							vector-valued features throughout message passing still incurs additional computational cost
-							 compared to purely invariant architectures.
-						</p>
-
-						<p>
-							Collectively, these works motivate our study: they demonstrate that equivariant 
-							architectures can achieve strong performance, but also highlight a computational trade-off. 
-							Our work examines whether a non-equivariant GNN with carefully designed data augmentation 
-							can recover similar behavior, particularly for vector-valued molecular properties, at 
-							reduced computational budget.
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 						</p>
 
 						<p>While mentioned invariant (or equivariant) architectures achieve high performance in vector quantity 
@@ -975,17 +809,10 @@ Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single laye
 						Margin note that clarifies some detail #main-content-block for intro section.
 		    </div>
 		
-<<<<<<< HEAD
 
 		</div>
 
 		<!-- RESULTS SECTION WRAPPED PROPERLY -->
-=======
-
-		</div>
-	
-		<!-- RESULTS SECTION (anchor before the "Does Strawberry learn..." block) -->
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 		<div class="content-margin-container" id="results">
 				<div class="margin-left-block">
 				</div>
@@ -1004,28 +831,6 @@ Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single laye
 					Non-equivariant models with sufficient expressivity and information about geometry are known to be
 					capable of learning equivariance.
 					</p>
-<<<<<<< HEAD
-=======
-
-				<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-              <mrow>
-                <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>y</mi>
-                </mrow>
-                <mo>/</mo>
-                <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>x</mi>
-                </mrow>
-              </mrow>
-              <mo>=</mo>
-              <mi>x</mi>
-            </math>
-          <br>
-
-
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 		    </div>
 		    <div class="margin-right-block" style="transform: translate(0%, -100%);"> 
           Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
@@ -1075,29 +880,6 @@ Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single laye
 		    </div>
 		</div>
 
-<<<<<<< HEAD
-=======
-		<div class="content-margin-container">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-            <h1>Another section</h1>
-            In this section we embed a video:
-						<video class='my-video' loop autoplay muted style="width: 725px">
-								<source src="./images/mtsh.mp4" type="video/mp4">
-						</video>
-		    </div>
-		    <div class="margin-right-block">
-					A caption for the video could go here.
-		    </div>
-		</div>
-
-		<!-- CONCLUSION SECTION -->
-		<!-- If you are going to include LLM-generated text,
-		 I would pass it through this app:
-		 https://gptzero.me
-		 And make sure it is not identified as AI generated.-->
->>>>>>> 2db33aeea174c728b213468a1e00516916bc2e1d
 		<div class="content-margin-container" id="conclusion">
 				<div class="margin-left-block">
 				</div>
