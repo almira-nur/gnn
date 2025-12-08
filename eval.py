@@ -24,6 +24,7 @@ BATCH_SIZE = 64
 LR = 0.001
 PLOT_LOGGED = False
 PLOT_RECOMPUTED = True
+LOG_Y_SCALE = True
 
 DATASET_TAG = "mini_200_conf_qm7x_processed_train"
 CHECKPOINT_ROOT = Path("checkpoints")
@@ -162,6 +163,8 @@ def plot_single(epochs, train_losses, val_losses, title, outfile_base):
     sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss")
+    if LOG_Y_SCALE:
+        ax.set_yscale("log")
     ax.set_title(title)
     ax.legend(frameon=True)
     sns.despine()
@@ -169,6 +172,60 @@ def plot_single(epochs, train_losses, val_losses, title, outfile_base):
     fig.savefig(FIG_ROOT / f"{outfile_base}.png", dpi=300, bbox_inches="tight")
     fig.savefig(FIG_ROOT / f"{outfile_base}.svg", bbox_inches="tight")
     plt.close(fig)
+
+
+def augment_title(augment_type: str) -> str:
+    match augment_type:
+        case "none":
+            return "No Augmentation"
+        case "superfib_end":
+            return "Augmentation"
+        case "superfib_intermediate":
+            return "Augmentation and Layerwise Loss"
+        case _:
+            return augment_type
+
+
+def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
+    entries = []
+    for m in MODEL_TYPES:
+        for a in AUGMENT_TYPES:
+            curves = curves_dict.get((m, a))
+            if curves is not None:
+                entries.append((m, a, curves))
+
+    if not entries:
+        print(f"No data for {grid_base}; skipping grid plot.")
+        return
+
+    n = len(entries)
+    ncols = min(3, n)
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
+    palette = sns.color_palette("colorblind", 2)
+
+    for idx, (m, a, curves) in enumerate(entries):
+        row, col = divmod(idx, ncols)
+        ax = axes[row][col]
+        epochs, train_losses, val_losses = curves
+        sns.lineplot(x=epochs, y=train_losses, marker="o", label="Train", ax=ax, color=palette[0])
+        sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
+        ax.set_title(f"{m.title()} with {augment_title(a)}{title_suffix}")
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel("Loss")
+        if LOG_Y_SCALE:
+            ax.set_yscale("log")
+        ax.legend(frameon=True, fontsize="small")
+
+    for ax in axes.flatten()[n:]:
+        ax.axis("off")
+
+    sns.despine()
+    fig.tight_layout()
+    fig.savefig(FIG_ROOT / f"{grid_base}.png", dpi=300, bbox_inches="tight")
+    fig.savefig(FIG_ROOT / f"{grid_base}.svg", bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved grid plot to {FIG_ROOT / (grid_base + '.png')} and .svg")
 
 
 all_curves = {}
@@ -191,90 +248,21 @@ for m in MODEL_TYPES:
         recomputed = recompute_losses(ckpt_dir, m, train_loader, val_loader) if PLOT_RECOMPUTED else None
         if recomputed is not None:
             recomputed_curves[(m, a)] = recomputed
-
-        title = f"{m.title()} ({a})"
+        title = f"{m.title()} with {augment_title(a)}"
         if PLOT_LOGGED:
             outfile_base = f"loss_curve_{m}_{a}_logged"
-            plot_single(*curves, title=title + " (logged)", outfile_base=outfile_base)
+            plot_single(*curves, title=title, outfile_base=outfile_base)
             print(f"Saved {outfile_base}.png/.svg in {FIG_ROOT}")
         if recomputed is not None:
             outfile_base_re = f"loss_curve_{m}_{a}_recomputed"
-            plot_single(*recomputed, title=title + " (recomputed)", outfile_base=outfile_base_re)
+            plot_single(*recomputed, title=title, outfile_base=outfile_base_re)
             print(f"Saved {outfile_base_re}.png/.svg in {FIG_ROOT}")
 
-# Grid plot across all available curves
 if PLOT_LOGGED and all_curves:
-    nrows = len(MODEL_TYPES)
-    ncols = len(AUGMENT_TYPES)
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
-    palette = sns.color_palette("colorblind", 2)
+    plot_grid(all_curves, grid_base="loss_curves_grid")
 
-    for i, m in enumerate(MODEL_TYPES):
-        for j, a in enumerate(AUGMENT_TYPES):
-            match a:
-                case 'none':
-                    title_a = 'No Augmentation'
-                case 'superfib_end':
-                    title_a = 'Augmentation'
-                case 'superfib_intermediate':
-                    title_a = 'Augmentation and Layerwise Loss'
-            ax = axes[i][j]
-            curves = all_curves.get((m, a))
-            if curves is None:
-                ax.axis("off")
-                ax.text(0.5, 0.5, "No data", ha="center", va="center")
-                continue
-            epochs, train_losses, val_losses = curves
-            sns.lineplot(x=epochs, y=train_losses, marker="o", label="Train", ax=ax, color=palette[0])
-            sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
-            ax.set_title(f"{m.title()} with {title_a}")
-            ax.set_xlabel("Epoch")
-            ax.set_ylabel("Loss")
-            ax.legend(frameon=True, fontsize="small")
-    sns.despine()
-    fig.tight_layout()
-    grid_base = "loss_curves_grid"
-    fig.savefig(FIG_ROOT / f"{grid_base}.png", dpi=300, bbox_inches="tight")
-    fig.savefig(FIG_ROOT / f"{grid_base}.svg", bbox_inches="tight")
-    plt.close(fig)
-    print(f"Saved grid plot to {FIG_ROOT / (grid_base + '.png')} and .svg")
-
-# Grid for recomputed curves
 if PLOT_RECOMPUTED and recomputed_curves:
-    nrows = len(MODEL_TYPES)
-    ncols = len(AUGMENT_TYPES)
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
-    palette = sns.color_palette("colorblind", 2)
+    plot_grid(recomputed_curves, grid_base="loss_curves_grid_recomputed", title_suffix=" (recomputed)")
 
-    for i, m in enumerate(MODEL_TYPES):
-        for j, a in enumerate(AUGMENT_TYPES):
-            match a:
-                case 'none':
-                    title_a = 'No Augmentation'
-                case 'superfib_end':
-                    title_a = 'Augmentation'
-                case 'superfib_intermediate':
-                    title_a = 'Augmentation and Layerwise Loss'
-
-            ax = axes[i][j]
-            curves = recomputed_curves.get((m, a))
-            if curves is None:
-                ax.axis("off")
-                ax.text(0.5, 0.5, "No data", ha="center", va="center")
-                continue
-            epochs, train_losses, val_losses = curves
-            sns.lineplot(x=epochs, y=train_losses, marker="o", label="Train", ax=ax, color=palette[0])
-            sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
-            ax.set_title(f"{m.title()} with {title_a}")
-            ax.set_xlabel("Epoch")
-            ax.set_ylabel("Loss")
-            ax.legend(frameon=True, fontsize="small")
-    sns.despine()
-    fig.tight_layout()
-    grid_base = "loss_curves_grid_recomputed"
-    fig.savefig(FIG_ROOT / f"{grid_base}.png", dpi=300, bbox_inches="tight")
-    fig.savefig(FIG_ROOT / f"{grid_base}.svg", bbox_inches="tight")
-    plt.close(fig)
-    print(f"Saved recomputed grid plot to {FIG_ROOT / (grid_base + '.png')} and .svg")
-else:
+if not all_curves and not recomputed_curves:
     print("No curves plotted; no checkpoints found for any model/augment combination.")
