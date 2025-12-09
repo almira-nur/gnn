@@ -2032,57 +2032,65 @@
       </div>
     </div>
 
-    <div class="content-margin-container">
-      <div class="margin-left-block"></div>
-      <div class="main-content-block">
-        <a id="evaluation"></a>
-        <h1>Evaluation</h1>
+		<!-- EVALUATION SECTION -->
+		<div class="content-margin-container">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+					<a id="evaluation"></a>
+					<h1>Evaluation</h1>
+					
+					<p>
+						Implementing layerwise losses adds a hard equivariance objective for the non-equivariant model.
+						Data augmentation alone provides a soft objective in favor of equivariance. Here we analyze
+						compare Chocolate's performance to all three training schedules of Strawberry.
+					</p>
+					<h3>RMSE Accuracy on Test Set</h3>
+					
+					<h3>Latent Geometry</h3>
+					To get a sense of the model's latent geometry, we performed PCA analysis on 
+					<div class="main-content-block">
+					<img src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png" width=512px/>
+					</div>
+					<div class="margin-right-block">
+							PCA analysis for latent vectors in Chocolate after training without any augmentations
+					</div>
+					</div>
+					
 
-        <p>
-          Implementing layerwise losses adds a hard equivariance objective for
-          the non-equivariant model. Data augmentation alone provides a soft
-          objective in favor of equivariance. Here we analyze Strawberry’s
-          performance with and without the additional layerwise equivariance
-          penalties. To evaluate whether including the layerwise losses enhanced
-          the model's ability to generalize to out of distribution data, we
-          performed the same analysis as in the previous section on molecules
-          from the [XYZ] dataset.
-        </p>
-        <h3>RMSE Accuracy on Test Set</h3>
-        <h3>Latent Geometry</h3>
-      </div>
-      <div class="margin-right-block"></div>
-    </div>
+					<div class="main-content-block">
+					<img src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png" width=512px/>
+					</div>
+					<div class="margin-right-block">
+								PCA analysis for latent vectors in Strawberry after training with intermediate layerwise
+								losses
+					</div>
+					</div>
+							
 
-    <div class="content-margin-container">
-      <div class="margin-left-block"></div>
-      <div class="main-content-block">
-        <img
-          src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png"
-          width="512"
-          alt="Latent PCA Chocolate"
-        />
-      </div>
-      <div class="margin-right-block">
-        PCA analysis for latent vectors in Chocolate after training without any
-        augmentations.
-      </div>
-    </div>
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <mrow>
+                  <mo>&#x2202;</mo>
+                  <mi>y</mi>
+                </mrow>
+                <mo>/</mo>
+                <mrow>
+                  <mo>&#x2202;</mo>
+                  <mi>x</mi>
+                </mrow>
+              </mrow>
+              <mo>=</mo>
+              <mi>x</mi>
+            </math>
+          <br>
+          
 
-    <div class="content-margin-container">
-      <div class="margin-left-block"></div>
-      <div class="main-content-block">
-        <img
-          src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png"
-          width="512"
-          alt="Latent PCA Strawberry"
-        />
-      </div>
-      <div class="margin-right-block">
-        PCA analysis for latent vectors in Strawberry after training with
-        intermediate layerwise losses.
-      </div>
-    </div>
+		    </div>
+		    <div class="margin-right-block" style="transform: translate(0%, -100%);"> 
+          Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
+		    </div>
+		</div>
 
     <div class="content-margin-container" id="conclusion">
       <div class="margin-left-block"></div>

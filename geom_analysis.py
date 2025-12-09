@@ -36,9 +36,9 @@ DEVICE = torch.device('cpu')
 
 SMALL_DATASETS = [
     "data/mini_200_conf_qm7x_processed_val.h5",
-    "data/mini_200_conf_qm7x_processed_train.h5",
 ]
-MAX_CONFS = 200
+MAX_CONFS = 5000000
+CONFS_PER_MOL = 1  # set to 1 to include all conformers; adjust if grouping by molecule
 PROJECTION_METHOD = "pca"
 PROJECTION_DIM = 2
 COLOR_BY = "target_norm"
@@ -254,7 +254,9 @@ def latest_checkpoint(ckpt_dir: Path) -> Optional[Path]:
 def main():
     dataset_path = pick_existing(*SMALL_DATASETS)
     base_dataset = QM7XDataset(dataset_path)
-    dataset = Subset(base_dataset, range(min(len(base_dataset), MAX_CONFS)))
+    # Use all conformers from the validation set (up to MAX_CONFS)
+    dataset_indices = list(range(min(len(base_dataset), MAX_CONFS)))
+    dataset = Subset(base_dataset, dataset_indices)
 
     loader = DataLoader(
         dataset,

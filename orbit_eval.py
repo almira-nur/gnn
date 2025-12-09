@@ -24,8 +24,10 @@ LR = 0.001
 DATASET_TAG = "mini_200_conf_qm7x_processed_train"
 CHECKPOINT_ROOT = Path("checkpoints")
 
-N_ROTATIONS = 32   # how many SO(3) samples to test
-BATCH_SIZE = 1     # important: 1 molecule per batch
+N_ROTATIONS = 64   # how many SO(3) samples to test
+BATCH_SIZE = 1     # process one molecule per batch for clean equivariance eval
+MAX_MOLECULES = 256  # set to None to use all; lower to speed up evaluation
+MAX_MOLECULES = 64  # set None to evaluate all molecules; lower to speed up
 
 
 # ---------------------------------------------------------
@@ -155,10 +157,10 @@ def compute_equivariance_error(model, graph, rotations):
 def main():
     # load dataset
     dataset = QM7XDataset("data/mini_200_conf_qm7x_processed_val.h5")
-    dataset = Subset(dataset, [0])  # test on 1 molecule
-    loader = DataLoader(dataset, batch_size=1, shuffle=False)
-
-    graph = next(iter(loader))
+    if MAX_MOLECULES is not None:
+        max_len = min(len(dataset), MAX_MOLECULES)
+        dataset = Subset(dataset, list(range(max_len)))
+    loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     # rotation samples
     rotations = superfibonacci_rotations(N_ROTATIONS, device=DEVICE, dtype=torch.float32)
@@ -179,12 +181,13 @@ def main():
             load_checkpoint(model, ckpt_path)
 
             print(f"Testing equivariance: {model_type}/{augment_type}")
-            layer_errors = compute_equivariance_error(model, graph, rotations)
+            for graph in loader:
+                layer_errors = compute_equivariance_error(model, graph, rotations)
 
-            all_results[(model_type, augment_type)] = layer_errors
+                all_results[(model_type, augment_type)] = layer_errors
 
-            for i, err in enumerate(layer_errors):
-                print(f"  Layer {i}: equivariance error = {err:.3e}")
+                for i, err in enumerate(layer_errors):
+                    print(f"  Layer {i}: equivariance error = {err:.3e}")
 
     # ---- summary table ----
     print("\n=== Equivariance Summary ===")
