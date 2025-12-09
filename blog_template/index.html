@@ -1,955 +1,1950 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="shortcut icon" href="images/icon.ico" />
 
-<head>
+    <style type="text/css">
+      body {
+        background-color: #f5f9ff;
+      }
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      math {
+        font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", serif;
+        line-height: 1.2;
+      }
 
-<link rel="shortcut icon" href="images/icon.ico">
+      /* Fix 1: Removed margin-left/right from display="block" math and rely on parent container */
+      math[display="block"] {
+        display: block;
+        margin: 0 auto !important; /* Center block equations within their container */
+        text-align: center !important;
+      }
 
-<style type="text/css">
-	body {
-		background-color: #f5f9ff;
-	}
+      .mathjax-mobile,
+      .mathml-non-mobile {
+        display: none;
+      }
 
-	math {
-		font-family: "STIX Two Math","Cambria Math","Latin Modern Math",serif;
-		line-height: 1.2;
-	}
+      .show-mathml .mathml-non-mobile {
+        display: block;
+      }
 
-	math[display="block"] {
-		display: block;
-		margin: 0 auto 8px;
-		text-align: center;
-	}
-	/* Hide both math displays initially, will display based on JS detection */
-  .mathjax-mobile, .mathml-non-mobile { display: none; }
-  /* Show the MathML content by default on non-mobile devices */
-  .show-mathml .mathml-non-mobile { display: block; }
-  .show-mathjax .mathjax-mobile { display: block; }
+      .show-mathjax .mathjax-mobile {
+        display: block;
+      }
 
-	.content-margin-container {
-		display: flex;
-		width: 100%; /* Ensure the container is full width */
-		justify-content: left; /* Horizontally centers the children in the container */
-		align-items: center;  /* Vertically centers the children in the container */
-	}
+      .content-margin-container {
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center;
+      }
 
-	.main-content-block {
-		width: 70%; /* Change this percentage as needed */
-    max-width: 1100px; /* Optional: Maximum width */
-		background-color: #fff;
-		border-left: 1px solid #DDD;
-		border-right: 1px solid #DDD;
-		padding: 8px 8px 8px 8px;
-		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;#"Avenir";
-	}
+      .main-content-block {
+        width: 70%;
+        max-width: 1100px;
+        background-color: #fff;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        padding: 8px;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light",
+          "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+      }
 
-	.margin-left-block {
-			font-size: 14px;
-			width: 15%; /* Change this percentage as needed */
-			max-width: 130px; /* Optional: Maximum width */
-			position: relative;
-			margin-left: 10px;
-			text-align: left;
-			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;#"Avenir";
-			padding: 5px;
-	}
+      .margin-left-block {
+        font-size: 14px;
+        width: 15%;
+        max-width: 130px;
+        position: relative;
+        margin-left: 10px;
+        text-align: left;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light",
+          "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        padding: 5px;
+      }
 
-	.margin-right-block {
-			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;#"Avenir";
-			font-size: 14px;
-			width: 25%; /* Change this percentage as needed */
-			max-width: 256px; /* Optional: Maximum width */
-			position: relative;
-			text-align: left;
-			padding: 10px;  /* Optional: Adds padding inside the caption */
-	}
+      .margin-right-block {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light",
+          "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        font-size: 14px;
+        width: 25%;
+        max-width: 256px;
+        position: relative;
+        text-align: left;
+        padding: 10px;
+      }
 
-	img {
-			max-width: 100%; /* Make sure it fits inside the container */
-			height: auto;
-			display: block;
-			margin: auto;
-	}
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: auto;
+      }
 
-	.equation {
-	text-align: center;
-	margin: 8px 0;
-	}
+      /* Fix 2: Added .equation-container to wrap each display math element for centering and margin */
+      .equation-container {
+        display: flex;
+        justify-content: center;
+        margin: 8px 0;
+      }
 
-	.equation math[display="block"] {
-	margin: 0 auto;
-	}
+      .equation {
+        /* Removed original .equation styles as they are replaced by .equation-container */
+      }
 
-	.my-video {
-			max-width: 100%; /* Make sure it fits inside the container */
-			height: auto;
-			display: block;
-			margin: auto;
-	}
+      .equation math[display="block"] {
+        margin: 0 auto; /* Redundant, but kept original content */
+      }
 
-	/* Hide both video displays initially, will display based on JS detection */
-  .vid-mobile, .vid-non-mobile { display: none; }
-  /* Show the video content by default on non-mobile devices */
-  .show-vid-mobile .vid-mobile { display: block; }
-  .show-vid-non-mobile .vid-non-mobile { display: block; }
+      .my-video {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: auto;
+      }
 
-	a:link,a:visited
-	{
-		color: #0e7862; /*#1367a7;*/
-		text-decoration: none;
-	}
+      .vid-mobile,
+      .vid-non-mobile {
+        display: none;
+      }
 
-	a:hover {
-		color: #24b597; /*#208799;*/
-	}
+      .show-vid-mobile .vid-mobile {
+        display: block;
+      }
 
-	h1 {
-		font-size: 18px;
-		margin-top: 4px;
-		margin-bottom: 10px;
-	}
+      .show-vid-non-mobile .vid-non-mobile {
+        display: block;
+      }
 
-	h2 {
-		font-size: 20px;
-		margin-top: 12px;
-		margin-bottom: 8px;
-	}
+      a:link,
+      a:visited {
+        color: #0e7862;
+        text-decoration: none;
+      }
 
-	h3 {
-		font-size: 16px;
-		margin-top: 10px;
-		margin-bottom: 6px;
-	}
+      a:hover {
+        color: #24b597;
+      }
 
-	table.header {
-    font-weight: 300;
-    font-size: 17px;
-    flex-grow: 1;
-		width: 70%;
-    max-width: calc(100% - 290px); /* Adjust according to the width of .paper-code-tab */
-	}
+      h1 {
+        font-size: 22px;
+        margin-top: 4px;
+        margin-bottom: 10px;
+      }
 
-	table td, table td * {
-	    vertical-align: middle;
-	    position: relative;
-	}
+      h2 {
+        font-size: 20px;
+        margin-top: 12px;
+        margin-bottom: 8px;
+      }
 
-	table.paper-code-tab {
-	    flex-shrink: 0;
-	    margin-left: 8px;
-	    margin-top: 8px;
-	    padding: 0px 0px 0px 8px;
-	    width: 290px;
-	    height: 150px;
-	}
+      h3 {
+        font-size: 16px;
+        margin-top: 10px;
+        margin-bottom: 6px;
+      }
 
-	.layered-paper { /* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
-		box-shadow:
-		        0px 0px 1px 1px rgba(0,0,0,0.35), /* The top layer shadow */
-		        5px 5px 0 0px #fff, /* The second layer */
-		        5px 5px 1px 1px rgba(0,0,0,0.35), /* The second layer shadow */
-		        10px 10px 0 0px #fff, /* The third layer */
-		        10px 10px 1px 1px rgba(0,0,0,0.35); /* The third layer shadow */
-		margin-top: 5px;
-		margin-left: 10px;
-		margin-right: 30px;
-		margin-bottom: 5px;
-	}
+      table.header {
+        font-weight: 300;
+        font-size: 17px;
+        flex-grow: 1;
+        width: 70%;
+        max-width: calc(100% - 290px);
+      }
 
-	hr {
-    height: 1px; /* Sets the height of the line to 1 pixel */
-    border: none; /* Removes the default border */
-    background-color: #DDD; /* Sets the line color to black */
-  }
+      table td,
+      table td * {
+        vertical-align: middle;
+        position: relative;
+      }
 
-	div.hypothesis {
-		width: 80%;
-		background-color: #EEE;
-		border: 1px solid black;
-		border-radius: 10px;
-		-moz-border-radius: 10px;
-		-webkit-border-radius: 10px;
-		font-family: Courier;
-		font-size: 18px;
-		text-align: center;
-		margin: auto;
-		padding: 16px 16px 16px 16px;
-	}
+      table.paper-code-tab {
+        flex-shrink: 0;
+        margin-left: 8px;
+        margin-top: 8px;
+        padding: 0 0 0 8px;
+        width: 290px;
+        height: 150px;
+      }
 
-	div.citation {
-    font-size: 0.8em;
-    background-color:#fff;
-    padding: 10px;
-		height: 200px;
-  }
+      .layered-paper {
+        box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.35), 5px 5px 0 0px #fff,
+          5px 5px 1px 1px rgba(0, 0, 0, 0.35), 10px 10px 0 0px #fff,
+          10px 10px 1px 1px rgba(0, 0, 0, 0.35);
+        margin-top: 5px;
+        margin-left: 10px;
+        margin-right: 30px;
+        margin-bottom: 5px;
+      }
 
-	.fade-in-inline {
-		position: absolute;
-		text-align: center;
-		margin: auto;
-		-webkit-mask-image: linear-gradient(to right,
-																			transparent 0%,
-																			transparent 40%,
-																			black 50%,
-																			black 90%,
-																			transparent 100%);
-		mask-image: linear-gradient(to right,
-																transparent 0%,
-																transparent 40%,
-																black 50%,
-																black 90%,
-																transparent 100%);
-		-webkit-mask-size: 8000% 100%;
-		mask-size: 8000% 100%;
-		animation-name: sweepMask;
-		animation-duration: 4s;
-		animation-iteration-count: infinite;
-		animation-timing-function: linear;
-		animation-delay: -1s;
-	}
+      hr {
+        height: 1px;
+        border: none;
+        background-color: #ddd;
+      }
 
-	.fade-in2-inline {
-			animation-delay: 1s;
-	}
+      div.hypothesis {
+        width: 80%;
+        background-color: #eee;
+        border: 1px solid black;
+        border-radius: 10px;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        font-family: Courier;
+        font-size: 18px;
+        text-align: center;
+        margin: auto;
+        padding: 16px;
+      }
 
-	.inline-div {
-			position: relative;
-	    display: inline-block; /* Makes both the div and paragraph inline-block elements */
-	    vertical-align: top; /* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
-	    width: 50px; /* Optional: Adds space between the div and the paragraph */
-	}
+      div.citation {
+        font-size: 0.8em;
+        background-color: #fff;
+        padding: 10px;
+        height: 200px;
+      }
 
-	/* Simple layout for model diagrams */
-	.model-diagrams {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 16px;
-		margin: 16px 0;
-	}
+      .fade-in-inline {
+        position: absolute;
+        text-align: center;
+        margin: auto;
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent 0%,
+          transparent 40%,
+          black 50%,
+          black 90%,
+          transparent 100%
+        );
+        mask-image: linear-gradient(
+          to right,
+          transparent 0%,
+          transparent 40%,
+          black 50%,
+          black 90%,
+          transparent 100%
+        );
+        -webkit-mask-size: 8000% 100%;
+        mask-size: 8000% 100%;
+        animation-name: sweepMask;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        animation-delay: -1s;
+      }
 
-	.model-diagrams figure {
-		flex: 1 1 200px;
-		text-align: center;
-		font-size: 14px;
-	}
+      .fade-in2-inline {
+        animation-delay: 1s;
+      }
 
-	.model-diagrams figcaption {
-		margin-top: 6px;
-		color: #555;
-	}
-.equation-row {
-  display: flex;
-  justify-content: center;
-  margin: 8px 0;
-}
+      .inline-div {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        width: 50px;
+      }
 
-.equation-row math[display="block"] {
-  margin: 0;
-}
-</style>
+      .model-diagrams {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin: 16px 0;
+      }
 
-	  <title>The Platonic Representation Hypothesis</title>
+      .model-diagrams figure {
+        flex: 1 1 200px;
+        text-align: center;
+        font-size: 14px;
+      }
 
-      <meta property="og:title" content="The Platonic Representation Hypothesis" />
-			<meta charset="UTF-8">
+      .model-diagrams figcaption {
+        margin-top: 6px;
+        color: #555;
+      }
+
+      /* Original .equation-row class, kept for structure but its function is largely taken by .equation-container */
+      .equation-row {
+        display: flex;
+        justify-content: center;
+        margin: 8px 0;
+      }
+
+      .equation-row math[display="block"] {
+        margin: 0 auto;
+      }
+    </style>
+
+    <title>The Platonic Representation Hypothesis</title>
+
+    <meta property="og:title" content="The Platonic Representation Hypothesis" />
+    <meta charset="UTF-8" />
   </head>
 
   <body>
+    <div class="content-margin-container">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <table class="header" align="left">
+          <tr>
+            <td colspan="4">
+              <span
+                style="
+                  font-size: 32px;
+                  font-family: 'Courier New', Courier, monospace;
+                "
+                >A deeper look into equivariance for molecular data</span
+              >
+            </td>
+          </tr>
+          <tr>
+            <td align="left">
+              <span style="font-size: 17px"
+                ><a href="your_website">Timothy Pinkhassik</a></span
+              >
+            </td>
+            <td align="left">
+              <span style="font-size: 17px"
+                ><a href="your_partner's_website">Almira Nurlanova</a></span
+              >
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" align="left">
+              <span style="font-size: 18px">Final project for 6.7960, MIT</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
 
-		<div class="content-margin-container">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<table class="header" align=left>
-								<tr>
-									<td colspan=4>
-										<span style="font-size: 32px; font-family: 'Courier New', Courier, monospace; /* Adds fallbacks */">A deeper look into equivariance for molecular data</span>
-									</td>
-								</tr>
-								<tr>
-										<td align=left>
-												<span style="font-size:17px"><a href="your_website">Timothy Pinkhassik</a></span>
-										</td>
-										<td align=left>
-												<span style="font-size:17px"><a href="your_partner's_website">Almira Nurlanova</a></span>
-										</td>
-								<tr>
-									<td colspan=4 align=left><span style="font-size:18px">Final project for 6.7960, MIT</span></td>
-								</tr>
-						</table>
-					</div>
-					<div class="margin-right-block">
-					</div>
-		</div>
-
-		<div class="content-margin-container" id="intro">
-				<div class="margin-left-block">
-          <div style="position:fixed; max-width:inherit; top:max(20%,120px)">
-              <b style="font-size:16px">Outline</b><br><br>
-              <a href="#intro">Introduction</a><br><br>
-              <a href="#background">Background</a><br><br>
-							<a href="#related_works">Related Works</a><br><br>
-			  			<a href="#methods">Methods</a><br><br>
-							<a href="#results">Results</a><br><br>
-			  			<a href="#evaluation">Evaluation</a><br><br>
-			  			<a href="#conclusion">Conclusion</a><br><br>
-              <a href="#implications_and_limitations">Implications and limitations</a><br><br>
-          </div>
-				</div>
-		    <div class="main-content-block">
-            <img src="./images/your_image_here.png" width=512px/>
-		    </div>
-		    <div class="margin-right-block">
-						Caption for the image.
-		    </div>
-		</div>
+    <div class="content-margin-container" id="intro">
+      <div class="margin-left-block">
+        <div style="position: fixed; max-width: inherit; top: max(20%, 120px)">
+          <b style="font-size: 16px">Outline</b><br /><br />
+          <a href="#intro">Introduction</a><br /><br />
+          <a href="#background">Background</a><br /><br />
+          <a href="#related_works">Related Works</a><br /><br />
+          <a href="#methods">Methods</a><br /><br />
+          <a href="#results">Results</a><br /><br />
+          <a href="#evaluation">Evaluation</a><br /><br />
+          <a href="#conclusion">Conclusion</a><br /><br />
+          <a href="#implications_and_limitations"
+            >Implications and limitations</a
+          ><br /><br />
+        </div>
+      </div>
+      <div class="main-content-block">
+        <img src="./images/ice_cream.webp" width="512" />
+      </div>
+      <div class="margin-right-block">Neapolitan ice cream</div>
+    </div>
 
     <div class="content-margin-container" id="intro-main">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h2>Introduction</h2>
-
-						<p>
-							A Graph Neural Network is one of the most naturally suitable architectures to represent molecular data,
-							 where a node corresponds to an atom and an edge corresponds to a chemical bond. 
-							Because of this structural alignment, there has been immense research done on using GNN 
-							to work with molecular data in various applications like property prediction, 
-							organic retrosynthesis, and protein-ligand binding. However, classic GNNs do not 
-							inherently encode and guarantee one of the central properties of molecules - 
-							rotational and translational (SE(3)) equivariance. Although scalar observable only require 
-							for the model ot be invariant to rotation and translation, vector quantities require
-							equivariance.
-						</p>
-
-						<p>
-							To address this limitation, a number of architectures with built-in equivariance have 
-							been proposed such as PaiNN, SchNet, EGNN. Despite achieving better performance and more 
-							meaningful and accurate physical representation, built-in equivariant GNNs are 
-							computationally expensive, especially when algorithms rely on spherical harmonics 
-							or per-edge vector update.
-						</p>
-
-						<p>
-							This raises an important question of effectiveness and design trade-off: 
-							Can a carefully designed non-equivariant GNN, trained on synthetically augmented data, 
-							learn equivariance and achieve similar results, while requiring less computations? To 
-							investigate this hypothesis, we designed a set of models to predict dipole moment of 
-							small organic molecules from QM7-X dataset. Dipole moment prediction is a particularly 
-							suitable benchmark for this case as it is a 3D-vector quantity; as molecule gets rotated 
-							the output should rotate in the same exact direction while retaining magnitude.
-						</p>
-
-						<p>
-							<b>Central hypothesis</b> is as follows: A non-equivariant GNN trained with additional rotational 
-							augmentation can approximate SE(3) equivariance and perform competitively enough while 
-							requiring less computational cost.
-						</p>
-
-						<p>
-							We decided to not use models that rely on spherical harmonics as they are more likely to be 
-							substantially expensive in computation complexity. To evaluate the effectiveness of equivariance 
-							learning we compared these three cases:
-						</p>
-
-						<ol>
-							<li>
-								<b>Vanilla</b> – a standard, non-equivariant GNN trained on the original dataset
-								without rotational augmentation.
-							</li>
-							<br/>
-							<li>
-								<b>Strawberry</b> – a standard, non-equivariant GNN with the same architecture as
-								Vanilla, but trained on rotationally augmented data. We used superfibonacci 
-								sampling to obtain rotated data from our train dataset.
-							</li>
-							<br/>
-							<li>
-								<b>Chocolate</b> – our built-in equivariant GNN in which internal vector features are
-								guaranteed to rotate with rotations of the input. It does not rely on spherical harmonics, 
-								which would increase computational cost by substantial amount, but rather on adding new 
-								information in form of vector features to each node. It was inspired by PaiNN and EGNN 
-								architectures that are described below. 
-							</li>
-						</ol>
-
-						<div class="model-diagrams">
-							<figure>
-								<img src="./images/model_vanilla.png" alt="Vanilla GNN diagram">
-								<figcaption>Vanilla: non-equivariant GNN trained on original data.</figcaption>
-							</figure>
-							<figure>
-								<img src="./images/model_strawberry.png" alt="Strawberry GNN diagram">
-								<figcaption>Strawberry: same architecture with rotationally augmented training data.</figcaption>
-							</figure>
-							<figure>
-								<img src="./images/model_chocolate.png" alt="Chocolate GNN diagram">
-								<figcaption>Chocolate: built-in equivariant GNN with vector features.</figcaption>
-							</figure>
-						</div>
-
-						<hr/>
-
-						<a id="background"></a>
-						<h2>Background</h2>
-
-						<h3>Latent Space</h3>
-						<p>
-							Deep learning models for molecules operate by mapping molecular structures into a latent
-							space, where each node and edge is represented by learned features.</p>
-
-						<h3>Equivariance</h3>
-
-						<p>
-						Let's define invariance and equivariance. Suppose we have
-						a function <em>f</em> and a transformation <em>g</em>. Then <em>f</em> is
-						invariant to <em>g</em> if
-						</p>
-
-						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-						<mrow>
-							<mi>f</mi>
-							<mo>(</mo>
-							<mi>g</mi><mo>⋅</mo><mi>x</mi>
-							<mo>)</mo>
-							<mo>=</mo>
-							<mi>f</mi>
-							<mo>(</mo><mi>x</mi><mo>)</mo>
-						</mrow>
-						</math>
-
-						<p>
-						and <em>f</em> is equivariant to <em>g</em> if
-						</p>
-
-						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-						<mrow>
-							<mi>f</mi>
-							<mo>(</mo>
-							<mi>g</mi><mo>⋅</mo><mi>x</mi>
-							<mo>)</mo>
-							<mo>=</mo>
-							<mi>g</mi><mo>⋅</mo>
-							<mi>f</mi>
-							<mo>(</mo><mi>x</mi><mo>)</mo>
-						</mrow>
-						</math>
-
-						<p>
-						In our case, we treat a molecule as a tuple
-						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<mi mathvariant="bold">M</mi>
-						</math>:
-						<div class="equation">
-						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-							<mrow>
-							<mi mathvariant="bold">M</mi>
-							<mo>=</mo>
-							<mo>(</mo>
-							<mi>V</mi><mo>,</mo>
-							<mi>E</mi><mo>,</mo>
-							<mi>z</mi><mo>,</mo>
-							<mi mathvariant="bold">r</mi><mo>,</mo>
-							<mi mathvariant="bold">μ</mi>
-							<mo>)</mo>
-							</mrow>
-						</math>
-						</div>
-
-						<p>
-						Here,
-						<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>V</mi></math>
-						is the set of nodes (atoms),
-						<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>E</mi></math>
-						is the set of edges (we treat the molecule as a point cloud so there are
-						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<mrow>
-							<msup><mi>N</mi><mn>2</mn></msup><mo>−</mo><mi>N</mi>
-							</mrow>
-						</math>
-						directed edges),
-						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<msub><mi>z</mi><mi>i</mi></msub>
-						</math>
-						are node labels (atomic identities),
-						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<mrow>
-							<mi mathvariant="bold">r</mi>
-							<mo>=</mo>
-							<mo>{</mo><msub><mi>r</mi><mi>i</mi></msub><mo>}</mo>
-							</mrow>
-						</math>
-						are 3D coordinates of atoms, and
-						<math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="bold">μ</mi></math>
-						is the dipole moment vector.
-						</p>
-						We used a rigid-body transformation consisting
-						of a rotation (a zero-vector as translational component), 
-						therefore our tuple could be expressed as follows after rotation:
-						</p>
-						<div class="equation">
-						<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-							<mrow>
-							<mi>R</mi><mo>⋅</mo>
-							<mi mathvariant="bold">M</mi>
-							<mo>=</mo>
-							<mo>(</mo>
-							<mi>V</mi><mo>,</mo>
-							<mi>E</mi><mo>,</mo>
-							<mi>z</mi><mo>,</mo>
-							<mi>R</mi><mi mathvariant="bold">r</mi><mo>,</mo>
-							<mi>R</mi><mi mathvariant="bold">μ</mi>
-							<mo>)</mo>
-							</mrow>
-						</math>
-						</div>
-						Keep in mind that since 3D coordinates and dipole moment are 3D vector quantities, 
-						we need to make sure that ground truth dipole moment gets rotated as well as the input molecule
-						as you can see above.
-		    </div>
-		    <div class="margin-right-block">
-		    </div>
-		</div>
-
-		<div class="content-margin-container" id="related_works">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h2>Related Works</h2>
-						<p>
-							There have been many attempts to learn the best representation of molecular data for better 
-							convergence, including string-based approaches (e.g. SMILES) and fingerprint-based approaches 
-							(e.g. ECFP, Morgan Fingerprints). However, these methods tend to lose structural information of 
-							molecules, which limits number of tasks neural networks could achieve with molecular data. 
-							This limitation drove the improvement of GNN-based models that operate directly on atomic 
-							graphs embedded in 3D space. 
-						</p>
-						<h3>Rotational and Translational Invariance based GNN models</h3>
-
-						<h4>SchNet</h4>
-						<p>
-							This deep learning architecture uses continuous-filter convolution layers, rather than message passing 
-							algorithms. Continious-filter convolution layer make it feasible to work with molecules 
-							scattered in 3D space, rather than classic grid view layers. The filter is implemented as a 
-							neural network, therefore it is a function, not a fixed kernel, that takes a displacement 
-							vector and outputs a learned weight. For efficiency the operation is applied per feature channel. 
-						</p>
-						<p>
-							However, SchNet cannot be used to predict vector quantities, as it only guarantees translational 
-							and rotational invariance, but not equivariance.
-						</p>
-
-						<h4>Equivariant Graph Neural Network (EGNN)</h4>
-						<p>
-							This deep learning architecture solves the SE(3) equivariance problem, while additionally 
-							introducing reflection equivariance, which makes the architecture E(n) equivariant. It 
-							involves more extended message passing that includes both scalar and vector features, 
-							turning the architecture suitable to predict dipole moment as well. Although the algorithm 
-							does not rely on spherical harmonics, it is more expressive than invariant SchNet, which 
-							comes with higher computational cost due to computing vector updates per edge.
-						</p>
-
-						<h4>Polarizable Interaction Neural Network (PaiNN)</h4>
-						<p>
-							It is a tensor-based SE(3)-equivariant network designed as a successor of SchNet.
-						</p>
-
-						<p>While mentioned invariant (or equivariant) architectures achieve high performance in vector quantity 
-							prediction, there is limited analysis and comparison of built-in equivariance and learned equivariance 
-							using rotational augmentation. Our project addresses this gap, which would allow to achieve similar 
-							performance at lower computational cost, while requiring the same amount of data. Superfibonacci 
-							sampling technique that was used to obtain more data through augmentation is a cheap process that 
-							does not significantly add up to cost.</p>
-		    </div>
-		    <div class="margin-right-block">
-		    </div>
-		</div>
-
-	<div class="content-margin-container" id="methods">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h1>Methods</h1>
-
-			<p>
-				For a simple prediction task on molecular data sensitive to 3D geometry, we chose to predict the vector
-				molecular dipole moment for small molecules from the QM7x dataset <a href="#ref_2">[2]</a>.
-				This dataset contains $\sim$7,000 small molecules with up to 7 "heavy" (non-hydrogen) atoms each, in various
-				conformations. We treated each molecule as a point cloud with labeled atom types. The coordinates of
-				molecules in QM7x are centered, as are coordinates of other computational datasets. For computational
-				tractability, we restricted our analysis to SO(3) equivariance instead of the more popular E(3) objective,
-				which avoided the necessity of augmenting data with translations and simplified evaluation. We expect the
-				conclusions found from an analysis of SO(3) equivariance to be transferrable to other symmetries.
-			</p>
-
-			<h3> Model Architecture</h3>
-
-			<p>
-			For each structure with <math><mi>N</mi></math> atoms, we built all
-			<math><mrow><msup><mi>N</mi><mn>2</mn></msup><mo>−</mo><mi>N</mi></mrow></math> directed
-			edges <math><mrow><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi>
-			<mo>)</mo></mrow></math> where
-			<math><mrow><mi>i</mi><mo>≠</mo><mi>j</mi></mrow></math>. Each node was featurized with a learned scalar
-			embedding of the atom type from the set
-			(H, C, N, O, F, P, S, Cl). Each edge <math><mrow><mo>(</mo><mi>i</mi><mo>,</mo><mi>j</mi>
-			<mo>)</mo></mrow></math> was featurized with the distance between atoms <math><mi>i</mi></math> and <math><mi>j</mi></math>.
-			We split the dataset into training, validation, and test sets with 80%, 10%, and 10% of molecules,
-			respectively, ensuring that different conformations of the same molecule were all in the same split.
-			For tractability in training, we randomly downsampled the training set to 200 conformers per each molecule.
-			</p>
-
-			<p>
-			A single layer of Chocolate maps
-			</p>
-
-		<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo><mo>↦</mo><mo>(</mo><msup><mi>x</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msup><mo>,</mo><mi mathvariant="bold">v</mi><mo>)</mo></mrow>
-</math>
-
-<p>
-Given a node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math> with adjacent node <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>j</mi></math>, the layer computes:
-</p>
-
-<ol>
-<li>The direction of the neighboring node and its distance:</li>
-	<br>
-	<math display="block"><mrow><msub><mi>𝐫</mi><mi>ij</mi></msub><mo>=</mo><msub><mi>𝐫</mi><mi mathvariant="normal">j</mi></msub><mo>−</mo><msub><mi>𝐫</mi><mi mathvariant="normal">i</mi></msub></mrow></math>
-	<br>
-	<math display="block"><mrow><msub><mi>d</mi><mi>ij</mi></msub><mo>=</mo><msup><mrow><mo>‖</mo><msub><mi>𝐫</mi><mi>ij</mi></msub><mo>‖</mo></mrow><mn>2</mn></msup></mrow></math>
-	<br>
-	<math display="block"><mrow><msub><mover><mi>𝐫</mi><mo>^</mo></mover><mi>ij</mi></msub><mo>=</mo><mfrac><msub><mi>𝐫</mi><mi>ij</mi></msub><msub><mi>d</mi><mi>ij</mi></msub></mfrac></mrow></math>
-	<br>
-
-<li> Concatenates scalar features to form message input:</li>
-
-<br>
-
-	<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-			<msub><mi>m</mi><mi>ij</mi></msub>
-			<mo>=</mo>
-			<msub><mi>MLP</mi><mi>msg</mi></msub><mo>(</mo><mrow><msubsup><mi>x</mi><mi>i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow>
-			<mo>,</mo>
-			<mrow><msubsup><mi>x</mi><mi>j</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow>
-			<mo>,</mo>
-			<mrow><msub><mi>d</mi><mi>ij</mi></msub></mrow>
-			<mo>)</mo>
-		</math>
-		<br>
-
-<li> Splits the output of the message MLP into vector gates and scalar messages:</li>
-
-<br>
-
-		<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-		<mo>(</mo><mrow><msub><mi>g</mi><mi>ij</mi></msub><mo>,</mo><msub><mi>s</mi><mi>ij</mi></msub></mrow><mo>)</mo>
-		<mo>=</mo>
-		<mo>split</mo><mo>(</mo><msub><mi>m</mi><mi>ij</mi></msub><mo>)</mo>
-	</math>
-	<br>
-
-<li> Calculates the vector message:</li>
-
-<br>
-
-		<math display="block"><mrow><msubsup><mi>m</mi><mi>ij</mi><mtext>vec</mtext></msubsup><mo>=</mo><msub><mover><mi>𝐫</mi><mo>^</mo></mover><mi>ij</mi></msub><mo>⊗</mo><msub><mi>g</mi><mi>ij</mi></msub></mrow></math>
-	<br>
-
-<li> Aggregates the messages:</li>
-
-<br>
-
-		<math display="block"><mrow><msub><mi>agg</mi><mi>x</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msub><mi>s</mi><mi>ij</mi></msub></mrow></math>
-	<br>
-		<math display="block"><mrow><msub><mi>agg</mi><mi>𝐯</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msub><mi>m</mi><mi>ij</mi></msub></mrow></math>
-	<br>
-
-<li>Mixes the hidden channels of the vector features (applies a single linear layer):</li>
-
-<br>
-
-	<math display="block"><mrow><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mtext>mix</mtext></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><msub><mi>W</mi><mtext>mix</mtext></msub></mrow></math>
-	<br>
-
-<li> And finally applies the updates:</li>
-
-<br>
-
-	<math display="block"><mrow><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msupsup><mo>+</mo><msub><mi>MLP</mi><mtext>upd</mtext></msub><mrow><mo>(</mo><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>,</mo><msub><mi>agg</mi><mi>x</mi></msub><mo>(</mo><mi>i</mi><mo>)</mo><mo>)</mo></mrow></mrow></math>
-	<br>
-	<math display="block"><mrow><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msupsup><mo>+</mo><msub><mi>agg</mi><mi>𝐯</mi></msub><mo>(</mo><mi>i</mi><mo>)</mo><mo>+</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mtext>mix</mtext></msubsup></mrow></math>
-	</ol>
-
-<p>
-The equivariance of this model is guaranteed by the use of relative position vectors <math><msub><mover><mi>𝐫</mi><mo>^</mo></mover><mi>ij</mi></msub></math>.
-Because these vectors depend only on the relative positions of atoms, they rotate consistently with any transformation from SO(3).
-</p>
-
-<p>
-Strawberry, however, uses a slightly different layer architecture. As input, instead of zero initialization, as is used
-in Chocolate, information about the molecular geometry is given through using atomic position vectors as the vector
-features of the first layer:
-</p>
-<br>
-<math display="block"><mrow><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mn>0</mn><mo>)</mo></mrow></msubsup><mo>=</mo><msub><mi>𝐫</mi><mi mathvariant="normal">i</mi></msub><mo>⊗</mo><msub><mn>𝟏</mn><mi>F</mi></msub></mrow></math>
-<br>
-
-<p>
-Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single layer of Strawberry:
-</p>
-
-<ol>
-
-<li>Computes a "pseudo-position" and "pseudo-distance" from the current vector features:</li>
-
-	<br>
-
-	<math display="block"><mrow><msubsup><mover><mi>𝐫</mi><mo>~</mo></mover><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>=</mo><mfrac><mn>1</mn><mi>F</mi></mfrac><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>F</mi></munderover></mrow><msubsup><mi>𝐯</mi><mrow><mi mathvariant="normal">i</mi><mo>,</mo><mo>:</mo><mo>,</mo><mi mathvariant="normal">k</mi></mrow><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow></math>
-
-	<br>
-
-	<math display="block"><mrow><msubsup><mover><mi>𝐫</mi><mo>~</mo></mover><mi>ij</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>=</mo><msubsup><mover><mi>𝐫</mi><mo>~</mo></mover><mi mathvariant="normal">j</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>−</mo><msubsup><mover><mi>𝐫</mi><mo>~</mo></mover><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></mrow></math>
-
-	<br>
-
-	<math display="block"><mrow><msubsup><mover><mi>d</mi><mo>~</mo></mover><mi>ij</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>=</mo><msup><mrow><mo>‖</mo><msubsup><mover><mi>𝐫</mi><mo>~</mo></mover><mi>ij</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>‖</mo></mrow><mn>2</mn></msup></mrow></math>
-
-	<br>
-
-<li> Creates a flattened representation <math><msubsup><mover><mi>𝐯</mi><mo>~</mo></mover><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup></math> of the vector features and concatenates it with the scalar features:</li>
-
-<br>
-
-	<math display="block"><mrow><msubsup><mover><mi>𝐯</mi><mo>~</mo></mover><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>=</mo><mi>flatten</mi><mrow><mo>(</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>)</mo></mrow></mrow></math>
-
-	<br>
-
-	<math display="block"><mrow><msubsup><mi>u</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>=</mo><mrow><mo>(</mo><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>,</mo><msubsup><mover><mi>𝐯</mi><mo>~</mo></mover><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>)</mo></mrow></mrow></math>
-
-	<br>
-
-<li> Computes messages with an MLP:</li>
-
-<br>
-
-<math display="block"><mrow><msub><mi>m</mi><mi>ij</mi></msub><mo>=</mo><msub><mi>MLP</mi><mtext>msg</mtext></msub><mrow><mo>(</mo><msubsup><mi>u</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>,</mo><msubsup><mi>u</mi><mi mathvariant="normal">j</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>,</mo><msubsup><mover><mi>d</mi><mo>~</mo></mover><mi>ij</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msupsup><mo>)</mo></mrow></mrow></math>
-
-<br>
-
-<li> Splits the output of the message MLP into vector gates and scalar messages:</li>
-
-<br>
-
-<math display="block"><mrow><mrow><mo>(</mo><msubsup><mi>m</mi><mi>ij</mi><mtext>scalar</mtext></msubsup><mo>,</mo><msubsup><mi>m</mi><mi>ij</mi><mtext>flat</mtext></msubsup><mo>)</mo></mrow><mo>=</mo><mi>split</mi><mrow><mo>(</mo><msub><mi>m</mi><mi>ij</mi></msub><mo>)</mo></mrow></mrow></math>
-
-	<br>
-
-<li> Reshapes the vector message:</li>
-
-<br>
-
-<math display="block"><mrow><msubsup><mi>m</mi><mi>ij</mi><mtext>vec</mtext></msubsup><mo>=</mo><mi>reshape</mi><mrow><mo>(</mo><msubsup><mi>m</mi><mi>ij</mi><mtext>flat</mtext></msubsup><mo>)</mo></mrow></mrow></math>
-
-	<br>
-
-<li> Aggregates the messages:</li>
-
-<br>
-
-	<math display="block"><mrow><msub><mi>agg</mi><mi>x</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msubsup><mi>m</mi><mi>ij</mi><mtext>scalar</mtext></msubsup></mrow></math>
-
-	<br>
-
-	<math display="block"><mrow><msub><mi>agg</mi><mi>𝐯</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mi>j</mi><mo>≠</mo><mi>i</mi></mrow></munder></mrow><msubsup><mi>m</mi><mi>ij</mi><mtext>vec</mtext></msubsup></mrow></math>
-
-	<br>
-
-<li>Mixes the hidden channels of the vector features (applies a single linear layer):</li>
-
-<br>
-
-	<math display="block"><mrow><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mtext>mix</mtext></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><msub><mi>W</mi><mtext>mix</mtext></msub></mrow></math>
-
-	<br>
-
-<li> And finally applies the updates:</li>
-
-<br>
-
-	<math display="block"><mrow><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msupsup><mo>=</mo><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msupsup><mo>+</mo><msub><mi>MLP</mi><mtext>upd</mtext></msub><mrow><mo>(</mo><msubsup><mi>x</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msubsup><mo>,</mo><msub><mi>agg</mi><mi>x</mi></msub><mo>(</mo><mi>i</mi><mo>)</mo><mo>)</mo></mrow></mrow></math>
-
-	<br>
-
-	<math display="block"><mrow><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mrow><mo>(</mo><mi>l</mi><mo>)</mo></mrow></msupsup><mo>+</mo><msub><mi>agg</mi><mi>𝐯</mi></msub><mo>(</mo><mi>i</mi><mo>)</mo><mo>+</mo><msubsup><mi>𝐯</mi><mi mathvariant="normal">i</mi><mtext>mix</mtext></msubsup></mrow></math>
-
-	</ol>
-
-	<h3>Directly penalizing deviations from equivariance</h3>
-
-	<p>
-	To encourange Strawberry to be equivariant, we had the model output a list of the intermediate vector features as well
-	as the final vector dipole prediction. During training with data augmentation, we examined the effect of adding an
-	extra loss term that penalized non-equivariant representations of intermediate vector features in Strawberry:
-	</p>
-
-	<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-		
-	</math>
-
-	<p>
-	Adding this loss term is tantamount to adding an extra objective. To avoid the model getting stuck in a local minimum
-	by predicting a trivial dipole (the zero vector) that perfectly satisfies equivariance, we scale this additional loss
-	term by a hyperparameter LAMBDA. For future implementations of such a layerwise loss, we will perform a
-	hyperparameter search to find optimal values of lambda.
-	</p>
-	<h3>Evaluation</h3>
-	To efficiently generate samples of SO(3) rotation matrices, we implemented the superfibonacci sampling algorithm.[ref]
-
-			</div>
-			<div class="margin-right-block">
-						Margin note that clarifies some detail #main-content-block for intro section.
-		    </div>
-		
-
-		</div>
-
-		<!-- RESULTS SECTION WRAPPED PROPERLY -->
-		<div class="content-margin-container" id="results">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-					<h1>Results: Does Strawberry learn to be equivariant?</h1>
-					<p>
-						Non-equivariant models with sufficient expressivity and information about geometry are known to be
-						capable of learning equivariance.  This both follows from universal approximation [LEHSNO 1993] and has been shown
-						in applications.[REF = LEARNED EQUIVARIANCE].  To evaluate whether Strawberry was able to converge
-						to equivariance with normal, data-augmented, and our layerwise loss regimes, we calculated the
-						cosine similarity of predicted dipoles and intermediate representations over a random sample of
-						molecules with [N] rotations applied to them.
-					</p>
-
-					<p>
-					Non-equivariant models with sufficient expressivity and information about geometry are known to be
-					capable of learning equivariance.
-					</p>
-		    </div>
-		    <div class="margin-right-block" style="transform: translate(0%, -100%);"> 
-          Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
-		    </div>
-		</div>
-
-		<!-- EVALUATION SECTION -->
-		<div class="content-margin-container">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-					<a id="evaluation"></a>
-					<h1>Evaluation</h1>
-					
-					<p>
-						Implementing layerwise losses adds a hard equivariance objective for the non-equivariant model.
-						Data augmentation alone provides a soft objective in favor of equivariance. Here we analyze Strawberry’s
-						performance with and without the additional layerwise equivariance penalties.
-						To evaluate whether including the layerwise losses enhanced the model's ability to generalize to 
-						out of distribution data, we performed the same analysis as in the previous section on molecules
-						from the [XYZ] dataset.
-					</p>
-					<h3>RMSE Accuracy on Test Set</h3>
-					
-					<h3>Latent Geometry</h3>
-					<div class="main-content-block">
-					<img src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png" width=512px/>
-					</div>
-					<div class="margin-right-block">
-								PCA analysis for latent vectors in Chocolate after training without any augmentations
-					</div>
-					</div>
-					
-
-					<div class="main-content-block">
-					<img src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png" width=512px/>
-					</div>
-					<div class="margin-right-block">
-								PCA analysis for latent vectors in Strawberry after training with intermediate layerwise
-								losses
-					</div>
-					</div>
-							
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h2>Introduction</h2>
+
+        <p>
+          A Graph Neural Network is one of the most naturally suitable
+          architectures to represent molecular data, where a node corresponds to
+          an atom and an edge corresponds to a chemical bond. Because of this
+          structural alignment, there has been immense research done on using
+          GNN to work with molecular data in various applications like property
+          prediction, organic retrosynthesis, and protein-ligand binding.
+          However, classic GNNs do not inherently encode and guarantee one of
+          the central properties of molecules - rotational and translational
+          (SE(3)) equivariance. Although scalar observable only require for the
+          model to be invariant to rotation and translation, vector quantities
+          require equivariance.
+        </p>
+
+        <p>
+          To address this limitation, a number of architectures with built-in
+          equivariance have been proposed such as PaiNN, SchNet, EGNN. Despite
+          achieving better performance and more meaningful and accurate physical
+          representation, built-in equivariant GNNs are computationally
+          expensive, especially when algorithms rely on spherical harmonics or
+          per-edge vector update.
+        </p>
+
+        <p>
+          This raises an important question of effectiveness and design
+          trade-off: Can a carefully designed non-equivariant GNN, trained on
+          synthetically augmented data, learn equivariance and achieve similar
+          results, while requiring less computations? To investigate this
+          hypothesis, we designed a set of models to predict dipole moment of
+          small organic molecules from QM7-X dataset. Dipole moment prediction
+          is a particularly suitable benchmark for this case as it is a
+          3D-vector quantity; as molecule gets rotated the output should rotate
+          in the same exact direction while retaining magnitude.
+        </p>
+
+        <p>
+          <b>Central hypothesis</b> is as follows: A non-equivariant GNN trained
+          with additional rotational augmentation can approximate SE(3)
+          equivariance and perform competitively enough while requiring less
+          computational cost.
+        </p>
+
+        <p>
+          We decided to not use models that rely on spherical harmonics as they
+          are more likely to be substantially expensive in computation
+          complexity. To evaluate the effectiveness of equivariance learning we
+          compared these three cases:
+        </p>
+
+        <ol>
+          <li>
+            <b>Vanilla</b> – a standard, non-equivariant GNN trained on the
+            original dataset without rotational augmentation.
+          </li>
+          <br />
+          <li>
+            <b>Strawberry</b> – a standard, non-equivariant GNN with the same
+            architecture as Vanilla, but trained on rotationally augmented data.
+            We used superfibonacci sampling to obtain rotated data from our
+            train dataset.
+          </li>
+          <br />
+          <li>
+            <b>Chocolate</b> – our built-in equivariant GNN in which internal
+            vector features are guaranteed to rotate with rotations of the
+            input. It does not rely on spherical harmonics, which would increase
+            computational cost by substantial amount, but rather on adding new
+            information in form of vector features to each node. It was inspired
+            by PaiNN and EGNN architectures that are described below.
+          </li>
+        </ol>
+
+        <div class="model-diagrams">
+          <figure>
+            <img src="./images/model_vanilla.png" alt="Vanilla GNN diagram" />
+            <figcaption>
+              Vanilla: non-equivariant GNN trained on original data.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./images/model_strawberry.png"
+              alt="Strawberry GNN diagram"
+            />
+            <figcaption>
+              Strawberry: same architecture with rotationally augmented training
+              data.
+            </figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./images/model_chocolate.png"
+              alt="Chocolate GNN diagram"
+            />
+            <figcaption>
+              Chocolate: built-in equivariant GNN with vector features.
+            </figcaption>
+          </figure>
+        </div>
+
+        <hr />
+
+        <a id="background"></a>
+        <h2>Background</h2>
+
+        <h3>Latent Space</h3>
+        <p>
+          Deep learning models for molecules operate by mapping molecular
+          structures into a latent space, where each node and edge is
+          represented by learned features.
+        </p>
+
+        <h3>Equivariance</h3>
+
+        <p>
+          Let's define invariance and equivariance. Suppose we have a function
+          <em>f</em> and a transformation <em>g</em>. Then <em>f</em> is
+          invariant to <em>g</em> if
+        </p>
+
+        <div class="equation-container">
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>g</mi>
+              <mo>⋅</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+              <mo>=</mo>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+
+        <p>and <em>f</em> is equivariant to <em>g</em> if</p>
+
+        <div class="equation-container">
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>g</mi>
+              <mo>⋅</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+              <mo>=</mo>
+              <mi>g</mi>
+              <mo>⋅</mo>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+
+        <p>
+          In our case, we treat a molecule as a tuple
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi mathvariant="bold">M</mi>
+          </math>
+          :
+        </p>
+        <div class="equation-container">
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi mathvariant="bold">M</mi>
+              <mo>=</mo>
+              <mo>(</mo>
+              <mi>V</mi>
+              <mo>,</mo>
+              <mi>E</mi>
+              <mo>,</mo>
+              <mi>z</mi>
+              <mo>,</mo>
+              <mi mathvariant="bold">r</mi>
+              <mo>,</mo>
+              <mi mathvariant="bold">μ</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+
+        <p>
+          Here,
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>V</mi>
+          </math>
+          is the set of nodes (atoms),
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>E</mi>
+          </math>
+          is the set of edges (we treat the molecule as a point cloud so there
+          are
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msup>
+                <mi>N</mi>
+                <mn>2</mn>
+              </msup>
+              <mo>−</mo>
+              <mi>N</mi>
+            </mrow>
+          </math>
+          directed edges),
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <msub>
+              <mi>z</mi>
+              <mi>i</mi>
+            </msub>
+          </math>
+          are node labels (atomic identities),
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi mathvariant="bold">r</mi>
+              <mo>=</mo>
+              <mo>{</mo>
+              <msub>
+                <mi>r</mi>
+                <mi>i</mi>
+              </msub>
+              <mo>}</mo>
+            </mrow>
+          </math>
+          are 3D coordinates of atoms, and
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi mathvariant="bold">μ</mi>
+          </math>
+          is the dipole moment vector.
+        </p>
+        <p>
+          We used a rigid-body transformation consisting of a rotation (a
+          zero-vector as translational component), therefore our tuple could be
+          expressed as follows after rotation:
+        </p>
+        <div class="equation-container">
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi>R</mi>
+              <mo>⋅</mo>
+              <mi mathvariant="bold">M</mi>
+              <mo>=</mo>
+              <mo>(</mo>
+              <mi>V</mi>
+              <mo>,</mo>
+              <mi>E</mi>
+              <mo>,</mo>
+              <mi>z</mi>
+              <mo>,</mo>
+              <mi>R</mi>
+              <mi mathvariant="bold">r</mi>
+              <mo>,</mo>
+              <mi>R</mi>
+              <mi mathvariant="bold">μ</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+        <p>
+          Keep in mind that since 3D coordinates and dipole moment are 3D vector
+          quantities, we need to make sure that ground truth dipole moment gets
+          rotated as well as the input molecule as you can see above.
+        </p>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+
+    <div class="content-margin-container" id="related_works">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h2>Related Works</h2>
+        <p>
+          There have been many attempts to learn the best representation of
+          molecular data for better convergence, including string-based
+          approaches (e.g. SMILES) and fingerprint-based approaches (e.g. ECFP,
+          Morgan Fingerprints). However, these methods tend to lose structural
+          information of molecules, which limits number of tasks neural networks
+          could achieve with molecular data. This limitation drove the
+          improvement of GNN-based models that operate directly on atomic graphs
+          embedded in 3D space.
+        </p>
+        <h3>Rotational and Translational Invariance based GNN models</h3>
+
+        <h4>SchNet</h4>
+        <p>
+          This deep learning architecture uses continuous-filter convolution
+          layers, rather than message passing algorithms. Continuous-filter
+          convolution layers make it feasible to work with molecules scattered
+          in 3D space, rather than classic grid view layers. The filter is
+          implemented as a neural network, therefore it is a function, not a
+          fixed kernel, that takes a displacement vector and outputs a learned
+          weight. For efficiency the operation is applied per feature channel.
+        </p>
+        <p>
+          However, SchNet cannot be used to predict vector quantities, as it
+          only guarantees translational and rotational invariance, but not
+          equivariance.
+        </p>
+
+        <h4>Equivariant Graph Neural Network (EGNN)</h4>
+        <p>
+          This deep learning architecture solves the SE(3) equivariance problem,
+          while additionally introducing reflection equivariance, which makes
+          the architecture E(n) equivariant. It involves more extended message
+          passing that includes both scalar and vector features, turning the
+          architecture suitable to predict dipole moment as well. Although the
+          algorithm does not rely on spherical harmonics, it is more expressive
+          than invariant SchNet, which comes with higher computational cost due
+          to computing vector updates per edge.
+        </p>
+
+        <h4>Polarizable Interaction Neural Network (PaiNN)</h4>
+        <p>
+          It is a tensor-based SE(3)-equivariant network designed as a successor
+          of SchNet.
+        </p>
+
+        <p>
+          While mentioned invariant (or equivariant) architectures achieve high
+          performance in vector quantity prediction, there is limited analysis
+          and comparison of built-in equivariance and learned equivariance using
+          rotational augmentation. Our project addresses this gap, which would
+          allow to achieve similar performance at lower computational cost,
+          while requiring the same amount of data. Superfibonacci sampling
+          technique that was used to obtain more data through augmentation is a
+          cheap process that does not significantly add up to cost.
+        </p>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+
+    <div class="content-margin-container" id="methods">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h1>Methods</h1>
+
+        <p>
+          For a simple prediction task on molecular data sensitive to 3D
+          geometry, we chose to predict the vector molecular dipole moment for
+          small molecules from the QM7x dataset <a href="#ref_2">[2]</a>. This
+          dataset contains approximately 7,000 small molecules with up to 7
+          "heavy" (non-hydrogen) atoms each, in various conformations. We
+          treated each molecule as a point cloud with labeled atom types. The
+          coordinates of molecules in QM7x are centered, as are coordinates of
+          other computational datasets. For computational tractability, we
+          restricted our analysis to SO(3) equivariance instead of the more
+          popular E(3) objective, which avoided the necessity of augmenting data
+          with translations and simplified evaluation. We expect the
+          conclusions found from an analysis of SO(3) equivariance to be
+          transferrable to other symmetries.
+        </p>
+
+        <h3>Model Architecture</h3>
+
+        <p>
+          For each structure with
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>N</mi>
+          </math>
+          atoms, we built all
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msup>
+                <mi>N</mi>
+                <mn>2</mn>
+              </msup>
+              <mo>−</mo>
+              <mi>N</mi>
+            </mrow>
+          </math>
+          directed edges
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>,</mo>
+              <mi>j</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+          where
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mi>i</mi>
+              <mo>≠</mo>
+              <mi>j</mi>
+            </mrow>
+          </math>
+          . Each node was featurized with a learned scalar embedding of the atom
+          type from the set (H, C, N, O, F, P, S, Cl). Each edge
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>,</mo>
+              <mi>j</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+          was featurized with the distance between atoms
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>i</mi>
+          </math>
+          and
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>j</mi>
+          </math>
+          . We split the dataset into training, validation, and test sets with
+          80%, 10%, and 10% of molecules, respectively, ensuring that different
+          conformations of the same molecule were all in the same split. For
+          tractability in training, we randomly downsampled the training set to
+          200 conformers per molecule.
+        </p>
+
+        <p>A single layer of Chocolate maps</p>
+
+        <div class="equation-container">
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mo>(</mo>
+              <msup>
+                <mi>x</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msup>
+              <mo>,</mo>
+              <mi mathvariant="bold">v</mi>
+              <mo>)</mo>
+              <mo>↦</mo>
+              <mo>(</mo>
+              <msup>
+                <mi>x</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                  <mo>)</mo>
+                </mrow>
+              </msup>
+              <mo>,</mo>
+              <mi mathvariant="bold">v</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+
+        <p>
+          Given a node
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>i</mi>
+          </math>
+          with adjacent node
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>j</mi>
+          </math>
+          , the layer computes:
+        </p>
+
+        <ol>
+          <li>The direction of the neighboring node and its distance:</li>
+          <br />
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msub>
+                  <mi>𝐫</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>=</mo>
+                <msub>
+                  <mi>𝐫</mi>
+                  <mi>j</mi>
+                </msub>
+                <mo>−</mo>
+                <msub>
+                  <mi>𝐫</mi>
+                  <mi>i</mi>
+                </msub>
+              </mrow>
+            </math>
+          </div>
+          <br />
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msub>
+                  <mi>d</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>=</mo>
+                <msup>
+                  <mrow>
+                    <mo>‖</mo>
+                    <msub>
+                      <mi>𝐫</mi>
+                      <mi>ij</mi>
+                    </msub>
+                    <mo>‖</mo>
+                  </mrow>
+                  <mn>2</mn>
+                </msup>
+              </mrow>
+            </math>
+          </div>
+          <br />
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msub>
+                  <mover>
+                    <mi>𝐫</mi>
+                    <mo>^</mo>
+                  </mover>
+                  <mi>ij</mi>
+                </msub>
+                <mo>=</mo>
+                <mfrac>
+                  <msub>
+                    <mi>𝐫</mi>
+                    <mi>ij</mi>
+                  </msub>
+                  <msub>
+                    <mi>d</mi>
+                    <mi>ij</mi>
+                  </msub>
+                </mfrac>
+              </mrow>
+            </math>
+          </div>
+          <br />
+
+          <li>Concatenates scalar features to form message input:</li>
+
+          <br />
+
+          <div class="equation-container">
+            <math
+              display="block"
+              xmlns="http://www.w3.org/1998/Math/MathML"
+            >
+              <mrow>
+                <msub>
+                  <mi>m</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>=</mo>
+                <msub>
+                  <mi>MLP</mi>
+                  <mi>msg</mi>
+                </msub>
+                <mo>(</mo>
+                <msubsup>
+                  <mi>x</mi>
+                  <mi>i</mi>
+                  <mrow>
+                    <mo>(</mo>
+                    <mi>l</mi>
+                    <mo>)</mo>
+                  </mrow>
+                </msubsup>
+                <mo>,</mo>
+                <msubsup>
+                  <mi>x</mi>
+                  <mi>j</mi>
+                  <mrow>
+                    <mo>(</mo>
+                    <mi>l</mi>
+                    <mo>)</mo>
+                  </mrow>
+                </msubsup>
+                <mo>,</mo>
+                <msub>
+                  <mi>d</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>)</mo>
+              </mrow>
+            </math>
+          </div>
+          <br />
+
+          <li>
+            Splits the output of the message MLP into vector gates and scalar
+            messages:
+          </li>
+
+          <br />
+
+          <div class="equation-container">
+            <math
+              display="block"
+              xmlns="http://www.w3.org/1998/Math/MathML"
+            >
+              <mrow>
+                <mo>(</mo>
+                <msub>
+                  <mi>g</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>,</mo>
+                <msub>
+                  <mi>s</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>)</mo>
+                <mo>=</mo>
+                <mo>split</mo>
+                <mo>(</mo>
+                <msub>
+                  <mi>m</mi>
+                  <mi>ij</mi>
+                </msub>
+                <mo>)</mo>
+              </mrow>
+            </math>
+          </div>
+          <br />
+
+          <li>Calculates the vector message:</li>
+
+          <br />
+
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msubsup>
+                  <mi>m</mi>
+                  <mi>ij</mi>
+                  <mtext>vec</mtext>
+                </msubsup>
+                <mo>=</mo>
+                <msub>
+                  <mover>
+                    <mi>𝐫</mi>
+                    <mo>^</mo>
+                  </mover>
+                  <mi>ij</mi>
+                </msub>
+                <mo>⊗</mo>
+                <msub>
+                  <mi>g</mi>
+                  <mi>ij</mi>
+                </msub>
+              </mrow>
+            </math>
+          </div>
+          <br />
+
+          <li>Aggregates the messages:</li>
+
+          <br />
+
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msub>
+                  <mi>agg</mi>
+                  <mi>x</mi>
+                </msub>
+                <mo stretchy="false">(</mo>
+                <mi>i</mi>
+                <mo stretchy="false">)</mo>
+                <mo>=</mo>
+                <munder>
+                  <mo movablelimits="false">∑</mo>
+                  <mrow>
+                    <mi>j</mi>
+                    <mo>≠</mo>
+                    <mi>i</mi>
+                  </mrow>
+                </munder>
+                <msub>
+                  <mi>s</mi>
+                  <mi>ij</mi>
+                </msub>
+              </mrow>
+            </math>
+          </div>
+          <br />
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msub>
+                  <mi>agg</mi>
+                  <mi>𝐯</mi>
+                </msub>
+                <mo stretchy="false">(</mo>
+                <mi>i</mi>
+                <mo stretchy="false">)</mo>
+                <mo>=</mo>
+                <munder>
+                  <mo movablelimits="false">∑</mo>
+                  <mrow>
+                    <mi>j</mi>
+                    <mo>≠</mo>
+                    <mi>i</mi>
+                  </mrow>
+                </munder>
+                <msub>
+                  <mi>m</mi>
+                  <mi>ij</mi>
+                </msub>
+              </mrow>
+            </math>
+          </div>
+          <br />
+
+          <li>
+            Mixes the hidden channels of the vector features (applies a single
+            linear layer):
+          </li>
+
+          <br />
+
+          <div class="equation-container">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+              <mrow>
+                <msubsup>
+                  <mi>𝐯</mi>
+                  <mi>i</mi>
+                  <mtext>mix</mtext>
+                </msubsup>
+                <mo>=</mo>
+                <msubsup>
+                  <mi>𝐯</mi>
+                  <mi>i</mi>
+                  <mrow>
+                    <mo>(</mo>
+                    <mi>l</mi>
+                    <mo>)</mo>
+                  </mrow>
+                </msubsup>
+                <msub>
+                  <mi>W</mi>
+                  <mtext>mix</mtext>
+                </msub>
+              </mrow>
+            </math>
+          </div>
+        </ol>
+
+          <li>And finally applies the updates:</li>
+
+          <br />
 
           <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-              <mrow>
+            <mrow>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
                 <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>y</mi>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                  <mo>)</mo>
                 </mrow>
-                <mo>/</mo>
-                <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>x</mi>
-                </mrow>
-              </mrow>
+              </msubsup>
               <mo>=</mo>
-              <mi>x</mi>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>+</mo>
+              <msub>
+                <mi>MLP</mi>
+                <mtext>upd</mtext>
+              </msub>
+              <mo>(</mo>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>,</mo>
+              <msub>
+                <mi>agg</mi>
+                <mi>x</mi>
+              </msub>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>)</mo>
+              <mo>)</mo>
+            </mrow>
+          </math>
+          <br />
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>+</mo>
+              <msub>
+                <mi>agg</mi>
+                <mi>𝐯</mi>
+              </msub>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>)</mo>
+              <mo>+</mo>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mtext>mix</mtext>
+              </msubsup>
+            </mrow>
+          </math>
+        </ol>
+
+        <p>
+          The equivariance of this model is guaranteed by the use of relative
+          position vectors
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <msub>
+              <mover>
+                <mi>𝐫</mi>
+                <mo>^</mo>
+              </mover>
+              <mi>ij</mi>
+            </msub>
+          </math>
+          . Because these vectors depend only on the relative positions of
+          atoms, they rotate consistently with any transformation from SO(3).
+        </p>
+
+        <p>
+          Strawberry, however, uses a slightly different layer architecture. As
+          input, instead of zero initialization, as is used in Chocolate,
+          information about the molecular geometry is given through using atomic
+          position vectors as the vector features of the first layer:
+        </p>
+        <br />
+        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+          <mrow>
+            <msubsup>
+              <mi>𝐯</mi>
+              <mi>i</mi>
+              <mrow>
+                <mo>(</mo>
+                <mn>0</mn>
+                <mo>)</mo>
+              </mrow>
+            </msubsup>
+            <mo>=</mo>
+            <msub>
+              <mi>𝐫</mi>
+              <mi>i</mi>
+            </msub>
+            <mo>⊗</mo>
+            <msub>
+              <mn>𝟏</mn>
+              <mi>F</mi>
+            </msub>
+          </mrow>
+        </math>
+        <br />
+
+        <p>Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single layer of Strawberry:</p>
+
+        <ol>
+          <li>
+            Computes a "pseudo-position" and "pseudo-distance" from the current
+            vector features:
+          </li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mover>
+                  <mi>𝐫</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <mfrac>
+                <mn>1</mn>
+                <mi>F</mi>
+              </mfrac>
+              <munderover>
+                <mo movablelimits="false">∑</mo>
+                <mrow>
+                  <mi>k</mi>
+                  <mo>=</mo>
+                  <mn>1</mn>
+                </mrow>
+                <mi>F</mi>
+              </munderover>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mrow>
+                  <mi>i</mi>
+                  <mo>,</mo>
+                  <mo>:</mo>
+                  <mo>,</mo>
+                  <mi>k</mi>
+                </mrow>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+            </mrow>
+          </math>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mover>
+                  <mi>𝐫</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>ij</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <msubsup>
+                <mover>
+                  <mi>𝐫</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>j</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>−</mo>
+              <msubsup>
+                <mover>
+                  <mi>𝐫</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+            </mrow>
+          </math>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mover>
+                  <mi>d</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>ij</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <msup>
+                <mrow>
+                  <mo>‖</mo>
+                  <msubsup>
+                    <mover>
+                      <mi>𝐫</mi>
+                      <mo>~</mo>
+                    </mover>
+                    <mi>ij</mi>
+                    <mrow>
+                      <mo>(</mo>
+                      <mi>l</mi>
+                      <mo>)</mo>
+                    </mrow>
+                  </msubsup>
+                  <mo>‖</mo>
+                </mrow>
+                <mn>2</mn>
+              </msup>
+            </mrow>
+          </math>
+
+          <br />
+
+          <li>
+            Creates a flattened representation
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <msubsup>
+                <mover>
+                  <mi>𝐯</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
             </math>
-          <br>
-          
+            of the vector features and concatenates it with the scalar features:
+          </li>
 
-		    </div>
-		    <div class="margin-right-block" style="transform: translate(0%, -100%);"> 
-          Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
-		    </div>
-		</div>
+          <br />
 
-		<div class="content-margin-container" id="conclusion">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h1>Conclusion</h1>
-						<p>
-							We compared three models—Vanilla, Strawberry, and Chocolate—to investigate whether a
-							non-equivariant GNN trained with rotational augmentation can approximate the performance of a
-							built-in equivariant architecture on vector-valued properties like dipole moments. Our methods
-							and experiments focus on the trade-offs between inductive bias (equivariance by design) and
-							computational efficiency (equivariance learned through data and auxiliary losses).
-						</p>
-						<p>
-							In the full report, this section can summarize quantitative results, highlight whether the central
-							hypothesis is supported, and connect back to the broader implications for molecular modeling and
-							equivariant deep learning.
-						</p>
-		    </div>
-		    <div class="margin-right-block">
-		    </div>
-		</div>
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mover>
+                  <mi>𝐯</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <mi>flatten</mi>
+              <mo>(</mo>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>)</mo>
+            </mrow>
+          </math>
 
-		<div class="content-margin-container" id="implications_and_limitations">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<h1>Implications and limitations</h1>
-						
+          <br />
 
-						As one of the main limitations of the project we would highlight that the hypothesis was only tested with 
-						a dataset that contains small organic molecules. Although small organic molecules are important in research, 
-						it is quite difficult to extrapolate our results to bigger molecular systems such as RNA and proteins, which are 
-						central in drug development field.
-		    </div>
-		    <div class="margin-right-block">
-		    </div>
-		</div>
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>u</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <mo>(</mo>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>,</mo>
+              <msubsup>
+                <mover>
+                  <mi>𝐯</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>)</mo>
+            </mrow>
+          </math>
 
-		<div class="content-margin-container" id="citations">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-						<div class='citation' id="references" style="height:auto"><br>
-							<span style="font-size:16px">References:</span><br><br>
-							<a id="ref_1"></a>[1] <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave">Allegory of the Cave</a>, Plato, c. 375 BC<br><br>
-							<a id="ref_2"></a>[2] <a href="">A Human-Level AGI</a>, OpenAI, 2025<br><br>
-						</div>
-		    </div>
-		    <div class="margin-right-block">
-		    </div>
-		</div>
-	</body>
+          <br />
+
+          <li>Computes messages with an MLP:</li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msub>
+                <mi>m</mi>
+                <mi>ij</mi>
+              </msub>
+              <mo>=</mo>
+              <msub>
+                <mi>MLP</mi>
+                <mtext>msg</mtext>
+              </msub>
+              <mo>(</mo>
+              <msubsup>
+                <mi>u</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>,</mo>
+              <msubsup>
+                <mi>u</mi>
+                <mi>j</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>,</mo>
+              <msubsup>
+                <mover>
+                  <mi>d</mi>
+                  <mo>~</mo>
+                </mover>
+                <mi>ij</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>)</mo>
+            </mrow>
+          </math>
+
+          <br />
+
+          <li>
+            Splits the output of the message MLP into vector gates and scalar
+            messages:
+          </li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <mo>(</mo>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>scalar</mtext>
+              </msubsup>
+              <mo>,</mo>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>flat</mtext>
+              </msubsup>
+              <mo>)</mo>
+              <mo>=</mo>
+              <mi>split</mi>
+              <mo>(</mo>
+              <msub>
+                <mi>m</mi>
+                <mi>ij</mi>
+              </msub>
+              <mo>)</mo>
+            </mrow>
+          </math>
+
+          <br />
+
+          <li>Reshapes the vector message:</li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>vec</mtext>
+              </msubsup>
+              <mo>=</mo>
+              <mi>reshape</mi>
+              <mo>(</mo>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>flat</mtext>
+              </msubsup>
+              <mo>)</mo>
+            </mrow>
+          </math>
+
+          <br />
+
+          <li>Aggregates the messages:</li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msub>
+                <mi>agg</mi>
+                <mi>x</mi>
+              </msub>
+              <mo stretchy="false">(</mo>
+              <mi>i</mi>
+              <mo stretchy="false">)</mo>
+              <mo>=</mo>
+              <munder>
+                <mo movablelimits="false">∑</mo>
+                <mrow>
+                  <mi>j</mi>
+                  <mo>≠</mo>
+                  <mi>i</mi>
+                </mrow>
+              </munder>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>scalar</mtext>
+              </msubsup>
+            </mrow>
+          </math>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msub>
+                <mi>agg</mi>
+                <mi>𝐯</mi>
+              </msub>
+              <mo stretchy="false">(</mo>
+              <mi>i</mi>
+              <mo stretchy="false">)</mo>
+              <mo>=</mo>
+              <munder>
+                <mo movablelimits="false">∑</mo>
+                <mrow>
+                  <mi>j</mi>
+                  <mo>≠</mo>
+                  <mi>i</mi>
+                </mrow>
+              </munder>
+              <msubsup>
+                <mi>m</mi>
+                <mi>ij</mi>
+                <mtext>vec</mtext>
+              </msubsup>
+            </mrow>
+          </math>
+
+          <br />
+
+          <li>
+            Mixes the hidden channels of the vector features (applies a single
+            linear layer):
+          </li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mtext>mix</mtext>
+              </msubsup>
+            </mrow>
+            <mo>=</mo>
+            <msubsup>
+              <mi>𝐯</mi>
+              <mi>i</mi>
+              <mrow>
+                <mo>(</mo>
+                <mi>l</mi>
+                <mo>)</mo>
+              </mrow>
+            </msubsup>
+            <msub>
+              <mi>W</mi>
+              <mtext>mix</mtext>
+            </msub>
+          </math>
+
+          <br />
+
+          <li>And finally applies the updates:</li>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>+</mo>
+              <msub>
+                <mi>MLP</mi>
+                <mtext>upd</mtext>
+              </msub>
+              <mo>(</mo>
+              <msubsup>
+                <mi>x</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>,</mo>
+              <msub>
+                <mi>agg</mi>
+                <mi>x</mi>
+              </msub>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>)</mo>
+              <mo>)</mo>
+            </mrow>
+          </math>
+
+          <br />
+
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mrow>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>=</mo>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mrow>
+                  <mo>(</mo>
+                  <mi>l</mi>
+                  <mo>)</mo>
+                </mrow>
+              </msubsup>
+              <mo>+</mo>
+              <msub>
+                <mi>agg</mi>
+                <mi>𝐯</mi>
+              </msub>
+              <mo>(</mo>
+              <mi>i</mi>
+              <mo>)</mo>
+              <mo>+</mo>
+              <msubsup>
+                <mi>𝐯</mi>
+                <mi>i</mi>
+                <mtext>mix</mtext>
+              </msubsup>
+            </mrow>
+          </math>
+        </ol>
+
+        <h3>Directly penalizing deviations from equivariance</h3>
+
+        <p>
+          To encourage Strawberry to be equivariant, we had the model output a
+          list of the intermediate vector features as well as the final vector
+          dipole prediction. During training with data augmentation, we examined
+          the effect of adding an extra loss term that penalized non-equivariant
+          representations of intermediate vector features in Strawberry:
+        </p>
+
+        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"></math>
+
+        <p>
+          Adding this loss term is tantamount to adding an extra objective. To
+          avoid the model getting stuck in a local minimum by predicting a
+          trivial dipole (the zero vector) that perfectly satisfies
+          equivariance, we scale this additional loss term by a hyperparameter
+          LAMBDA. For future implementations of such a layerwise loss, we will
+          perform a hyperparameter search to find optimal values of lambda.
+        </p>
+
+        <h3>Evaluation</h3>
+        <p>
+          To efficiently generate samples of SO(3) rotation matrices, we
+          implemented the superfibonacci sampling algorithm.[ref]
+        </p>
+      </div>
+      <div class="margin-right-block">
+        Margin note that clarifies some detail #main-content-block for intro
+        section.
+      </div>
+    </div>
+
+    <div class="content-margin-container" id="results">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h1>Results: Does Strawberry learn to be equivariant?</h1>
+        <p>
+          Non-equivariant models with sufficient expressivity and information
+          about geometry are known to be capable of learning equivariance. This
+          both follows from universal approximation [LEHSNO 1993] and has been
+          shown in applications.[REF = LEARNED EQUIVARIANCE]. To evaluate
+          whether Strawberry was able to converge to equivariance with normal,
+          data-augmented, and our layerwise loss regimes, we calculated the
+          cosine similarity of predicted dipoles and intermediate
+          representations over a random sample of molecules with [N] rotations
+          applied to them.
+        </p>
+
+        <p>
+          Non-equivariant models with sufficient expressivity and information
+          about geometry are known to be capable of learning equivariance.
+        </p>
+      </div>
+      <div class="margin-right-block" style="transform: translate(0%, -100%)">
+        Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a
+        >.
+      </div>
+    </div>
+
+    <div class="content-margin-container">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <a id="evaluation"></a>
+        <h1>Evaluation</h1>
+
+        <p>
+          Implementing layerwise losses adds a hard equivariance objective for
+          the non-equivariant model. Data augmentation alone provides a soft
+          objective in favor of equivariance. Here we analyze Strawberry’s
+          performance with and without the additional layerwise equivariance
+          penalties. To evaluate whether including the layerwise losses enhanced
+          the model's ability to generalize to out of distribution data, we
+          performed the same analysis as in the previous section on molecules
+          from the [XYZ] dataset.
+        </p>
+        <h3>RMSE Accuracy on Test Set</h3>
+        <h3>Latent Geometry</h3>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+
+    <div class="content-margin-container">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <img
+          src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png"
+          width="512"
+          alt="Latent PCA Chocolate"
+        />
+      </div>
+      <div class="margin-right-block">
+        PCA analysis for latent vectors in Chocolate after training without any
+        augmentations.
+      </div>
+    </div>
+
+    <div class="content-margin-container">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <img
+          src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png"
+          width="512"
+          alt="Latent PCA Strawberry"
+        />
+      </div>
+      <div class="margin-right-block">
+        PCA analysis for latent vectors in Strawberry after training with
+        intermediate layerwise losses.
+      </div>
+    </div>
+
+    <div class="content-margin-container" id="conclusion">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h1>Conclusion</h1>
+        <p>
+          We compared three models—Vanilla, Strawberry, and Chocolate—to
+          investigate whether a non-equivariant GNN trained with rotational
+          augmentation can approximate the performance of a built-in equivariant
+          architecture on vector-valued properties like dipole moments. Our
+          methods and experiments focus on the trade-offs between inductive bias
+          (equivariance by design) and computational efficiency (equivariance
+          learned through data and auxiliary losses).
+        </p>
+        <p>
+          In the full report, this section can summarize quantitative results,
+          highlight whether the central hypothesis is supported, and connect
+          back to the broader implications for molecular modeling and
+          equivariant deep learning.
+        </p>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+
+    <div class="content-margin-container" id="implications_and_limitations">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h1>Implications and limitations</h1>
+
+        <p>
+          As one of the main limitations of the project we would highlight that
+          the hypothesis was only tested with a dataset that contains small
+          organic molecules. Although small organic molecules are important in
+          research, it is quite difficult to extrapolate our results to bigger
+          molecular systems such as RNA and proteins, which are central in drug
+          development field.
+        </p>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+
+    <div class="content-margin-container" id="citations">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <div class="citation" id="references" style="height: auto">
+          <br />
+          <span style="font-size: 16px">References:</span><br /><br />
+          <a id="ref_1"></a>[1]
+          <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave"
+            >Allegory of the Cave</a
+          >, Plato, c. 375 BC<br /><br />
+          <a id="ref_2"></a>[2] <a href="">A Human-Level AGI</a>, OpenAI,
+          2025<br /><br />
+        </div>
+      </div>
+      <div class="margin-right-block"></div>
+    </div>
+  </body>
 </html>
