@@ -1,8 +1,12 @@
 import glob
+import math
 from pathlib import Path
+import textwrap
 
-from tqdm import tqdm
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from matplotlib.ticker import MaxNLocator
+from tqdm import tqdm
 import seaborn as sns
 import torch
 from torch import nn
@@ -11,20 +15,31 @@ from torch_geometric.utils import remove_self_loops
 
 from models.chocolate import Chocolate
 from models.strawberry import Strawberry
-from models.vanilla import Vanilla
 from qm7x_dataset import QM7XDataset
 
 sns.set_theme(style="whitegrid", context="talk")
+rcParams.update({
+    "axes.edgecolor": "#C0C0C0",
+    "axes.linewidth": 1.0,
+    "grid.color": "#E6E6E6",
+    "grid.linewidth": 0.8,
+    "axes.titleweight": "bold",
+})
 
-MODEL_TYPES = ["chocolate", "strawberry", "vanilla"]
+MODEL_TYPES = ["chocolate", "strawberry"]
 AUGMENT_TYPES = ["none", "superfib_end", "superfib_intermediate"]
 HIDDEN_DIM = 64
 N_LAYERS = 3
 BATCH_SIZE = 64
 LR = 0.001
-PLOT_LOGGED = False
-PLOT_RECOMPUTED = True
-LOG_Y_SCALE = True
+PLOT_LOGGED = True
+PLOT_RECOMPUTED = False
+LOG_Y_SCALE = False
+SKIP_EPOCHS = {"chocolate": 1, "strawberry": 4}
+LINE_WIDTH = 2.2
+MARKER_SIZE = 7
+MARKER_EDGE_WIDTH = 0.8
+PALETTE = sns.color_palette("Set2", 2)
 
 DATASET_TAG = "mini_200_conf_qm7x_processed_train"
 CHECKPOINT_ROOT = Path("checkpoints")
@@ -77,16 +92,13 @@ def build_model(model_type: str):
         return Chocolate(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS)
     if model_type == "strawberry":
         return Strawberry(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS)
-    if model_type == "vanilla":
-        return Vanilla(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS)
     raise ValueError(f"Unknown model type: {model_type}")
-
 
 def evaluate_loader(loader, model):
     mse = nn.MSELoss()
     model.eval()
     losses = []
-    with torch.no_grad():
+    with torch.inference_mode():
         for batch in tqdm(loader):
             batch = batch.to(DEVICE)
             z = batch.z
@@ -111,7 +123,7 @@ def checkpoint_dir(model_type: str, augment_type: str) -> Path:
     return CHECKPOINT_ROOT / name / "checkpoints"
 
 
-def load_losses(ckpt_dir: Path):
+def load_losses(ckpt_dir: Path, skip_epochs: int = 0):
     ckpt_paths = sorted(ckpt_dir.glob("checkpoint_epoch_*.pt"),
                         key=lambda p: int(p.stem.split("_")[-1]))
     if not ckpt_paths:
@@ -124,11 +136,14 @@ def load_losses(ckpt_dir: Path):
         epochs.append(ckpt["epoch"])
         train_losses.append(ckpt["loss"])
         val_losses.append(ckpt["val_loss"])
-    # Drop epoch 0 if present
-    return epochs[1:], train_losses[1:], val_losses[1:]
+    filtered = [(e, t, v) for e, t, v in zip(epochs, train_losses, val_losses) if e > skip_epochs]
+    if not filtered:
+        return None
+    epochs_f, train_f, val_f = zip(*filtered)
+    return list(epochs_f), list(train_f), list(val_f)
 
 
-def recompute_losses(ckpt_dir: Path, model_type: str, train_loader, val_loader):
+def recompute_losses(ckpt_dir: Path, model_type: str, train_loader, val_loader, skip_epochs: int = 0):
     ckpt_paths = sorted(ckpt_dir.glob("checkpoint_epoch_*.pt"),
                         key=lambda p: int(p.stem.split("_")[-1]))
     if not ckpt_paths:
@@ -150,22 +165,47 @@ def recompute_losses(ckpt_dir: Path, model_type: str, train_loader, val_loader):
     if not recomputed:
         return None
     recomputed.sort(key=lambda x: x[0])
-    epochs = [e for e, _, _ in recomputed]
-    train_losses = [t for _, t, _ in recomputed]
-    val_losses = [v for _, _, v in recomputed]
+    filtered = [(e, t, v) for e, t, v in recomputed if e > skip_epochs]
+    if not filtered:
+        return None
+    epochs = [e for e, _, _ in filtered]
+    train_losses = [t for _, t, _ in filtered]
+    val_losses = [v for _, _, v in filtered]
     return epochs, train_losses, val_losses
 
 
 def plot_single(epochs, train_losses, val_losses, title, outfile_base):
-    palette = sns.color_palette("colorblind", 2)
-    fig, ax = plt.subplots(figsize=(8, 4))
-    sns.lineplot(x=epochs, y=train_losses, marker="o", label="Train", ax=ax, color=palette[0])
-    sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
+    fig, ax = plt.subplots(figsize=(8.5, 4.5))
+    sns.lineplot(
+        x=epochs,
+        y=train_losses,
+        marker="o",
+        markersize=MARKER_SIZE,
+        markeredgewidth=MARKER_EDGE_WIDTH,
+        linewidth=LINE_WIDTH,
+        label="Train",
+        ax=ax,
+        color=PALETTE[0],
+        alpha=0.9,
+    )
+    sns.lineplot(
+        x=epochs,
+        y=val_losses,
+        marker="o",
+        markersize=MARKER_SIZE,
+        markeredgewidth=MARKER_EDGE_WIDTH,
+        linewidth=LINE_WIDTH,
+        label="Val",
+        ax=ax,
+        color=PALETTE[1],
+        alpha=0.9,
+    )
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss")
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     if LOG_Y_SCALE:
         ax.set_yscale("log")
-    ax.set_title(title)
+    ax.set_title(textwrap.fill(title, width=28))
     ax.legend(frameon=True)
     sns.despine()
     fig.tight_layout()
@@ -199,22 +239,65 @@ def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
         return
 
     n = len(entries)
-    ncols = min(3, n)
-    nrows = (n + ncols - 1) // ncols
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
-    palette = sns.color_palette("colorblind", 2)
+    ncols = math.ceil(math.sqrt(n))
+    nrows = math.ceil(n / ncols)
+    fig, axes = plt.subplots(
+        nrows=nrows,
+        ncols=ncols,
+        figsize=(4.2 * ncols, 3.4 * nrows),
+        squeeze=False,
+    )
+
+    # Use shared limits to make comparisons visually cleaner
+    all_vals = []
+    for _, _, curves in entries:
+        _, t_loss, v_loss = curves
+        all_vals.extend(t_loss)
+        all_vals.extend(v_loss)
+    if all_vals:
+        y_min, y_max = min(all_vals), max(all_vals)
+        y_pad = 0.05 * (y_max - y_min + 1e-9)
+        shared_ylim = (y_min - y_pad, y_max + y_pad)
+    else:
+        shared_ylim = None
 
     for idx, (m, a, curves) in enumerate(entries):
         row, col = divmod(idx, ncols)
         ax = axes[row][col]
         epochs, train_losses, val_losses = curves
-        sns.lineplot(x=epochs, y=train_losses, marker="o", label="Train", ax=ax, color=palette[0])
-        sns.lineplot(x=epochs, y=val_losses, marker="o", label="Val", ax=ax, color=palette[1])
-        ax.set_title(f"{m.title()} with {augment_title(a)}{title_suffix}")
+        sns.lineplot(
+            x=epochs,
+            y=train_losses,
+            marker="o",
+            markersize=MARKER_SIZE,
+            markeredgewidth=MARKER_EDGE_WIDTH,
+            linewidth=LINE_WIDTH,
+            label="Train",
+            ax=ax,
+            color=PALETTE[0],
+            alpha=0.9,
+        )
+        sns.lineplot(
+            x=epochs,
+            y=val_losses,
+            marker="o",
+            markersize=MARKER_SIZE,
+            markeredgewidth=MARKER_EDGE_WIDTH,
+            linewidth=LINE_WIDTH,
+            label="Val",
+            ax=ax,
+            color=PALETTE[1],
+            alpha=0.9,
+        )
+        wrapped_title = textwrap.fill(f"{m.title()} with {augment_title(a)}{title_suffix}", width=28)
+        ax.set_title(wrapped_title)
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         if LOG_Y_SCALE:
             ax.set_yscale("log")
+        if shared_ylim and not LOG_Y_SCALE:
+            ax.set_ylim(*shared_ylim)
         ax.legend(frameon=True, fontsize="small")
 
     for ax in axes.flatten()[n:]:
@@ -222,6 +305,7 @@ def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
 
     sns.despine()
     fig.tight_layout()
+    fig.subplots_adjust(hspace=0.35, wspace=0.28)
     fig.savefig(FIG_ROOT / f"{grid_base}.png", dpi=300, bbox_inches="tight")
     fig.savefig(FIG_ROOT / f"{grid_base}.svg", bbox_inches="tight")
     plt.close(fig)
@@ -240,12 +324,13 @@ val_loader = DataLoader(QM7XDataset(val_path), batch_size=BATCH_SIZE, shuffle=Fa
 for m in MODEL_TYPES:
     for a in AUGMENT_TYPES:
         ckpt_dir = checkpoint_dir(m, a)
-        curves = load_losses(ckpt_dir)
+        skip_epochs = SKIP_EPOCHS.get(m, 0)
+        curves = load_losses(ckpt_dir, skip_epochs=skip_epochs)
         if curves is None:
             print(f"Skipping {m}/{a}: no checkpoints in {ckpt_dir}")
             continue
         all_curves[(m, a)] = curves
-        recomputed = recompute_losses(ckpt_dir, m, train_loader, val_loader) if PLOT_RECOMPUTED else None
+        recomputed = recompute_losses(ckpt_dir, m, train_loader, val_loader, skip_epochs=skip_epochs) if PLOT_RECOMPUTED else None
         if recomputed is not None:
             recomputed_curves[(m, a)] = recomputed
         title = f"{m.title()} with {augment_title(a)}"
