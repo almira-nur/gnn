@@ -34,12 +34,15 @@ def scan(path: str):
     plt.savefig(out_path)
     plt.close()
     print(f"Saved histogram to {out_path}")
-    
+
+    # Baseline RMSEs
     zero_vec = np.zeros(3)
-    mse_zero = np.mean(np.sum((dip - zero_vec)**2, axis=1))
-    print(f"Predict-zero baseline -> MSE {mse_zero:.6f}")
+    mse_zero = np.mean(np.sum((dip - zero_vec) ** 2, axis=1))
+    rmse_zero = np.sqrt(mse_zero)
+    print(f"Predict-zero baseline -> MSE {mse_zero:.6f} | RMSE {rmse_zero:.6f}")
     mean_vec = dip.mean(axis=0)
-    mse_mean = np.mean(np.sum((dip - mean_vec)**2, axis=1))
-    print(f"Predict-mean baseline -> mean vector {mean_vec}, MSE {mse_mean:.6f}")
+    mse_mean = np.mean(np.sum((dip - mean_vec) ** 2, axis=1))
+    rmse_mean = np.sqrt(mse_mean)
+    print(f"Predict-mean baseline -> mean vector {mean_vec}, MSE {mse_mean:.6f} | RMSE {rmse_mean:.6f}")
 
 scan(TRAIN_DATA)

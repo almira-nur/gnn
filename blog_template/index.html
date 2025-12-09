@@ -505,7 +505,8 @@
 						</math>
 						</div>
 						Keep in mind that since 3D coordinates and dipole moment are 3D vector quantities, 
-						we need to make sure that ground truth dipole moment gets rotated as well as the input molecule as you can see above.
+						we need to make sure that ground truth dipole moment gets rotated as well as the input molecule
+						as you can see above.
 		    </div>
 		    <div class="margin-right-block">
 		    </div>
@@ -853,8 +854,27 @@ Where, as before, <math><mi>F</mi></math> is the hidden dimension. A single laye
 						out of distribution data, we performed the same analysis as in the previous section on molecules
 						from the [XYZ] dataset.
 					</p>
-			
+					<h3>RMSE Accuracy on Test Set</h3>
 					
+					<h3>Latent Geometry</h3>
+					<div class="main-content-block">
+					<img src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png" width=512px/>
+					</div>
+					<div class="margin-right-block">
+								PCA analysis for latent vectors in Chocolate after training without any augmentations
+					</div>
+					</div>
+					
+
+					<div class="main-content-block">
+					<img src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png" width=512px/>
+					</div>
+					<div class="margin-right-block">
+								PCA analysis for latent vectors in Strawberry after training with intermediate layerwise
+								losses
+					</div>
+					</div>
+							
 
           <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
               <mrow>
