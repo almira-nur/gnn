@@ -375,11 +375,11 @@
 
         <p>
           To address this limitation, a number of architectures with built-in
-          equivariance have been proposed such as PaiNN, SchNet, EGNN. Despite
+          equivariance have been proposed such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref1">[2]</a>, EGNN <a href="#ref1">[3]</a>. Despite
           achieving better performance and more meaningful and accurate physical
           representation, built-in equivariant GNNs are computationally
           expensive, especially when algorithms rely on spherical harmonics or
-          per-edge vector update.
+          per-edge vector update <a href="#ref1">[4]</a>, <a href="#ref1">[5]</a>.
         </p>
 
         <p>
@@ -388,7 +388,7 @@
           synthetically augmented data, learn equivariance and achieve similar
           results, while requiring less computations? To investigate this
           hypothesis, we designed a set of models to predict dipole moment of
-          small organic molecules from QM7-X dataset. Dipole moment prediction
+          small organic molecules from QM7-X dataset <a href="#ref1">[6]</a>. Dipole moment prediction
           is a particularly suitable benchmark for this case as it is a
           3D-vector quantity; as molecule gets rotated the output should rotate
           in the same exact direction while retaining magnitude.
@@ -418,7 +418,7 @@
             <b>Strawberry</b> – a standard, non-equivariant GNN with the same
             architecture as Vanilla, but trained on rotationally augmented data.
             We used superfibonacci sampling to obtain rotated data from our
-            train dataset.
+            train dataset. <a href="#ref1">[7]</a>
           </li>
           <br />
           <li>
@@ -813,8 +813,8 @@
         <p>
           There have been many attempts to learn the best representation of
           molecular data for better convergence, including string-based
-          approaches (e.g. SMILES) and fingerprint-based approaches (e.g. ECFP,
-          Morgan Fingerprints). However, these methods tend to lose structural
+          approaches (e.g. SMILES <a href="#ref1">[8]</a>) and fingerprint-based approaches (e.g. ECFP,
+          Morgan Fingerprints <a href="#ref1">[9]</a>). However, these methods tend to lose structural
           information of molecules, which limits number of tasks neural networks
           could achieve with molecular data. This limitation drove the
           improvement of GNN-based models that operate directly on atomic graphs
@@ -1257,32 +1257,31 @@
 
           <br />
 
-          <div class="equation-container">
-            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-              <mrow>
-                <msubsup>
-                  <mi>𝐯</mi>
-                  <mi>i</mi>
-                  <mtext>mix</mtext>
-                </msubsup>
-                <mo>=</mo>
-                <msubsup>
-                  <mi>𝐯</mi>
-                  <mi>i</mi>
-                  <mrow>
-                    <mo>(</mo>
-                    <mi>l</mi>
-                    <mo>)</mo>
-                  </mrow>
-                </msubsup>
-                <msub>
-                  <mi>W</mi>
-                  <mtext>mix</mtext>
-                </msub>
-              </mrow>
-            </math>
-          </div>
-        </ol>
+            <div class="equation-container">
+              <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mtext>mix</mtext>
+                  </msubsup>
+                  <mo>=</mo>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mrow>
+                      <mo>(</mo>
+                      <mi>l</mi>
+                      <mo>)</mo>
+                    </mrow>
+                  </msubsup>
+                  <msub>
+                    <mi>W</mi>
+                    <mtext>mix</mtext>
+                  </msub>
+                </mrow>
+              </math>
+            </div>
 
           <li>And finally applies the updates:</li>
 
@@ -1995,8 +1994,7 @@
         </p>
       </div>
       <div class="margin-right-block">
-        Margin note that clarifies some detail #main-content-block for intro
-        section.
+        ⊗ symbol stands for Kronecker product.
       </div>
     </div>
 
@@ -2125,14 +2123,51 @@
         <div class="citation" id="references" style="height: auto">
           <br />
           <span style="font-size: 16px">References:</span><br /><br />
-          <a id="ref_1"></a>[1]
-          <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave"
-            >Allegory of the Cave</a
-          >, Plato, c. 375 BC<br /><br />
-          <a id="ref_2"></a>[2] <a href="">A Human-Level AGI</a>, OpenAI,
-          2025<br /><br />
-          <a id="ref_3"></a>[3] <a href="">Equivariant message passing for the prediction of tensorial properties and molecular spectra</a>, Kristof T. Schütt, Oliver T. Unke, Michael Gastegger,
-          2021<br /><br />
+<ol>
+  <li id="ref1"> 
+    <a href="https://arxiv.org/abs/1706.08566" target="_blank">Schütt, K. T., et al. (2017).</a> SchNet: A continuous-filter convolutional neural network for modeling quantum interactions.
+    NeurIPS.
+  </li>
+
+  <li id="ref2">
+    <a href="https://arxiv.org/abs/2102.03150" target="_blank">Schütt, K. T., et al. (2021).</a> Equivariant message passing for the prediction of tensorial properties (PaiNN).
+    ICML. 
+  </li>
+
+  <li id="ref3">
+    <a href="https://arxiv.org/abs/2102.09844" target="_blank">Satorras, V. G., et al. (2021).</a> E(n) Equivariant Graph Neural Networks.
+    ICML. 
+  </li>
+
+  <li id="ref4">
+    <a href="https://arxiv.org/abs/1802.08219" target="_blank">Thomas, N., et al. (2018).</a> Tensor Field Networks: Rotation- and translation-equivariant neural networks for 3D point clouds.
+    ICLR. 
+  </li>
+
+  <li id="ref5">
+    <a href="https://arxiv.org/abs/2006.10503" target="_blank">Fuchs, F. B., et al. (2020).</a> SE(3)-Transformers: 3D equivariant attention networks.
+    NeurIPS.
+  </li>
+
+  <li id="ref6"> 
+    <a href="https://www.nature.com/articles/s41597-021-00882-8" target="_blank">Hoja, J., et al. (2021).</a> QM7-X: A comprehensive dataset of quantum-mechanical properties.
+    Scientific Data.
+  </li>
+
+  <li id="ref7">
+    <a href="https://pubs.acs.org/doi/10.1021/ci00057a005" target="_blank">Weininger, D. (1988).</a> SMILES, a chemical language and information system. J. Chem. Inf. Comput. Sci. 
+  </li>
+
+  <li id="ref8">
+    <a href="https://pubs.acs.org/doi/10.1021/ci100050t" target="_blank">Rogers, D., Hahn, M. (2010).</a> Extended-connectivity fingerprints. J. Chem. Inf. Model. 
+  </li>
+
+  <li id="ref9">
+    <a href="https://www.cs.toronto.edu/~jacobson/seminar/superfibonacci.pdf" target="_blank">Wong, T., Cohn, A. (2011).</a> Superfibonacci sampling.
+    ACM SIGGRAPH.
+  </li>
+</ol>
+
         </div>
       </div>
       <div class="margin-right-block"></div>
