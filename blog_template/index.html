@@ -375,11 +375,11 @@
 
         <p>
           To address this limitation, a number of architectures with built-in
-          equivariance have been proposed such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref1">[2]</a>, EGNN <a href="#ref1">[3]</a>. Despite
+          equivariance have been proposed such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref2">[2]</a>, EGNN <a href="#ref3">[3]</a>. Despite
           achieving better performance and more meaningful and accurate physical
           representation, built-in equivariant GNNs are computationally
           expensive, especially when algorithms rely on spherical harmonics or
-          per-edge vector update <a href="#ref1">[4]</a>, <a href="#ref1">[5]</a>.
+          per-edge vector update <a href="#ref4">[4]</a>, <a href="#ref5">[5]</a>.
         </p>
 
         <p>
@@ -388,10 +388,17 @@
           synthetically augmented data, learn equivariance and achieve similar
           results, while requiring less computations? To investigate this
           hypothesis, we designed a set of models to predict dipole moment of
-          small organic molecules from QM7-X dataset <a href="#ref1">[6]</a>. Dipole moment prediction
+          small organic molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction
           is a particularly suitable benchmark for this case as it is a
           3D-vector quantity; as molecule gets rotated the output should rotate
-          in the same exact direction while retaining magnitude.
+          in the same exact direction while retaining magnitude. Dipole moment is 
+          essential in determining how charge is spread out in a molecule, which 
+          defines polarity and influences properties like membrane permeability and 
+          solubility. Knowing dipole moment can fasten estimation of polarity-based 
+          properties, therefore helps to avoid running computationally expensive Density 
+          Functional Theory (DFT), which is used for accurate dipole moment calculations. 
+          On top of that, dipole moment calculations help generate infra-red (IR) spectra, 
+          which enables monitoring reactions in real-time.
         </p>
 
         <p>
@@ -418,7 +425,7 @@
             <b>Strawberry</b> – a standard, non-equivariant GNN with the same
             architecture as Vanilla, but trained on rotationally augmented data.
             We used superfibonacci sampling to obtain rotated data from our
-            train dataset. <a href="#ref1">[7]</a>
+            train dataset. <a href="#ref7">[7]</a>
           </li>
           <br />
           <li>
@@ -816,14 +823,13 @@
         <p>
           There have been many attempts to learn the best representation of
           molecular data for better convergence, including string-based
-          approaches (e.g. SMILES <a href="#ref1">[8]</a>) and fingerprint-based approaches (e.g. Extended-Connectivity Fingerprints <a href="#ref1">[9]</a>). However, these methods tend to lose structural
+          approaches (e.g. SMILES <a href="#ref8">[8]</a>) and fingerprint-based approaches (e.g. Extended-Connectivity Fingerprints <a href="#ref9">[9]</a>). However, these methods tend to lose structural
           information of molecules, which limits number of tasks neural networks
           could achieve with molecular data. This limitation drove the
           improvement of GNN-based models that operate directly on atomic graphs
           embedded in 3D space.
         </p>
         <h3>Rotational and Translational Invariance based GNN models</h3>
-
         <h4>SchNet</h4>
         <p>
           This deep learning architecture uses continuous-filter convolution
@@ -869,7 +875,7 @@
           cheap process that does not significantly add up to cost.
         </p>
       </div>
-      <div class="margin-right-block"></div>
+      <div class="margin-right-block">Interestingly, <a href="#ref_10">[10]</a> was published recently, where authors used GNN architecture with SO(3) equivariance embedded through local coordinates to predict the tensorial response properties of molecules, including dipole moment. This shows that it is an active field of research that is interesting in chemistry. </div>
     </div>
 
     <div class="content-margin-container" id="methods">
@@ -880,7 +886,7 @@
         <p>
           For a simple prediction task on molecular data sensitive to 3D
           geometry, we chose to predict the vector molecular dipole moment for
-          small molecules from the QM7x dataset <a href="#ref_2">[2]</a>. This
+          small molecules from the QM7-x dataset. This
           dataset contains approximately 7,000 small molecules with up to 7
           "heavy" (non-hydrogen) atoms each, in various conformations. We
           treated each molecule as a point cloud with labeled atom types. The
@@ -2021,8 +2027,7 @@
           about geometry are known to be capable of learning equivariance.
         </p>
       </div>
-      <div class="margin-right-block" style="transform: translate(0%, -100%)">
-        Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a
+      <div class="margin-right-block" style="transform: translate(0%, -100%)"></a
         >.
       </div>
     </div>
@@ -2165,8 +2170,13 @@
   </li>
 
   <li id="ref9">
-    <a href="https://openaccess.thecvf.com/content/CVPR2022/papers/Alexa_Super-Fibonacci_Spirals_Fast_Low-Discrepancy_Sampling_of_SO3_CVPR_2022_paper.pdf" target="_blank">Alexa, Marc (2022).</a> Super-Fibonacci Spirals: Fast, Low-Discrepancy Sampling of SO(3).
+    <a href="https://openaccess.thecvf.com/content/CVPR2022/papers/Alexa_Super-Fibonacci_Spirals_Fast_Low-Discrepancy_Sampling_of_SO3_CVPR_2022_paper.pdf" target="_blank">Alexa, M. (2022).</a> Super-Fibonacci Spirals: Fast, Low-Discrepancy Sampling of SO(3).
     IEEE Xplore.
+  </li>
+
+  <li id="ref10">
+    <a href="https://arxiv.org/pdf/2511.07087" target="_blank">Filling, J. P. (2025).</a> Direct Molecular Polarizability Prediction with
+SO(3) Equivariant Local Frame GNNs.
   </li>
 </ol>
 
