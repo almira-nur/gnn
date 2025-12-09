@@ -1946,5 +1946,15 @@
       </div>
       <div class="margin-right-block"></div>
     </div>
+	<script>
+  $(function () {
+    $('math[display="block"]').each(function () {
+      // only wrap if not already inside a .equation-container
+      if (!$(this).parent().hasClass('equation-container')) {
+        $(this).wrap('<div class="equation-container"></div>');
+      }
+    });
+  });
+</script>
   </body>
 </html>
