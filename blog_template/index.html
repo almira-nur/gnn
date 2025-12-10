@@ -8,6 +8,18 @@
       body {
         background-color: #f5f9ff;
       }
+      .equation {
+  text-align: center;
+  font-family: "Times New Roman", serif;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+.equation sub,
+.equation sup {
+  font-size: 0.75em;
+  line-height: 0;
+}
 
       math {
         font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", serif;
@@ -407,17 +419,13 @@
         <h2>Introduction</h2>
 
         <p>
-          A Graph Neural Network is one of the most naturally suitable
-          architectures to represent molecular data, where a node corresponds to
-          an atom and an edge corresponds to a chemical bond. Because of this
-          structural alignment, there has been immense research done on using
-          GNN to work with molecular data in various applications like property
-          prediction, organic retrosynthesis, and protein-ligand binding.
-          However, classic GNNs do not inherently encode and guarantee one of
-          the central properties of molecules - rotational and translational
-          (SE(3)) equivariance. Although scalar observable only require for the
-          model to be invariant to rotation and translation, vector quantities
-          require equivariance.
+          A Graph Neural Network is one of the most naturally suitable architectures to 
+          represent molecular data, where a node corresponds to an atom and an edge corresponds to a 
+          chemical bond. Because of this structural alignment, there has been immense research on using 
+          GNNs for molecular applications like property prediction, organic retrosynthesis, and protein - ligand 
+          binding. However, classic GNNs do not inherently encode one of the central properties of molecules - rotational 
+          and translational (SE(3)) equivariance. Although scalar observables only require invariance to rotation and translation, 
+          vector quantities require equivariance.
         </p>
 
         <p>
@@ -430,22 +438,17 @@
         </p>
 
         <p>
-          This raises an important question of effectiveness and design
-          trade-off: Can a carefully designed non-equivariant GNN, trained on
-          synthetically augmented data, learn equivariance and achieve similar
-          results, while requiring less computations? To investigate this
+          This raises an important question of effectiveness and design trade-off: 
+          Can a carefully designed non-equivariant GNN, trained on synthetically augmented data, 
+          learn equivariance and achieve similar results while requiring fewer computations? To investigate this
           hypothesis, we designed a set of models to predict dipole moment of
-          small organic molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction
-          is a particularly suitable benchmark for this case as it is a
-          3D-vector quantity; as molecule gets rotated the output should rotate
-          in the same exact direction while retaining magnitude. Dipole moment is 
-          essential in determining how charge is spread out in a molecule, which 
-          defines polarity and influences properties like membrane permeability and 
-          solubility. Knowing dipole moment can fasten estimation of polarity-based 
-          properties, therefore helps to avoid running computationally expensive Density 
-          Functional Theory (DFT), which is used for accurate dipole moment calculations. 
-          On top of that, dipole moment calculations help generate infra-red (IR) spectra, 
-          which enables monitoring reactions in real-time.
+          small organic molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction is a suitable 
+          benchmark because it is a 3D vector quantity: as a molecule rotates, the output should rotate identically 
+          while retaining magnitude. Dipole moment is essential for determining charge distribution, which defines 
+          polarity and influences properties like membrane permeability and solubility. Knowing dipole moments 
+          can speed up polarity-based property estimation and helps avoid running computationally expensive Density 
+          Functional Theory (DFT), which is used for accurate dipole calculations. Dipole moments also enable 
+          generation of infrared (IR) spectra used for real-time reaction monitoring.
         </p>
 
         <p>
@@ -456,10 +459,9 @@
         </p>
 
         <p>
-          We decided to not use models that rely on spherical harmonics as they
-          are more computationally expensive and RBF expansion is not necessary to test our
-          hypothesis. To evaluate the effectiveness of equivariance learning we
-          compared these three cases:
+          We chose not to use models that rely on spherical harmonics, as they are more computationally 
+          expensive and RBF expansion is unnecessary for testing our hypothesis. To evaluate the 
+          effectiveness of learned equivariance, we compared three cases:
         </p>
 
         <ol>
@@ -469,18 +471,16 @@
           </li>
           <br />
           <li>
-            <b>Strawberry</b> – a standard, non-equivariant GNN with the same
-            architecture as Vanilla, but trained on rotationally augmented data.
-            We used Super-Fibonacci sampling to create SO(3) augmentations of our
-            train dataset <a href="#ref7">[7]</a>.
+            <b>Strawberry</b> – the same architecture as Vanilla, but 
+            trained on rotationally augmented data. We used Super-Fibonacci 
+            sampling to generate SO(3) augmentations of our training set <a href="#ref7">[7]</a>.
           </li>
           <br />
           <li>
-            <b>Chocolate</b> – our equivariant GNN based on EGNN <a href="#ref3">[3]</a> in which internal
-            vector features are guaranteed to rotate with rotations of the
-            input. It does not rely on spherical harmonics, which would increase
-            computational cost by substantial amount, but rather on adding new
-            information in form of vector features to each node.
+            <b>Chocolate</b> – our equivariant GNN based on EGNN <a href="#ref3">[3]</a> 
+            in which internal vector features are guaranteed to rotate with the input. It does 
+            not rely on spherical harmonics, which would substantially increase computational cost, 
+            but instead adds vector features to each node.
           </li>
         </ol>
         <div class="figure-wrapper">
@@ -860,7 +860,7 @@
           rotated as well as the input molecule as you can see above.
         </p>
       </div>
-      <div class="margin-right-block"></div>
+      <div class="margin-right-block">EGNN outperformed most models, which was the reason we picked it as inspiration, as shown in <a href="#ref3">[3]</a></div>
     </div>
     <div class="content-margin-container" id="related_works">
       <div class="margin-left-block"></div>
@@ -908,7 +908,10 @@
         <h4>Polarizable Interaction Neural Network (PaiNN) <a href="#ref2">[2]</a></h4>
         <p>
           It is a tensor-based SE(3)-equivariant network designed as a successor
-          of SchNet.
+          of SchNet. PaiNN updates both scalar and vector channels, which allows predicting vector-valued 
+          quantities, including dipole moment. PaiNN does not rely on spherical harmonics, but it uses interaction 
+          blocks that mix scalar and vector features that preserve SE(3) transformation rules. However, it is also
+          computationally expensive due to the need to per-edge vector updates.
         </p>
 
         <p>
@@ -1312,31 +1315,13 @@
 
           <br />
 
-            <div class="equation-container">
-              <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-                <mrow>
-                  <msubsup>
-                    <mi>𝐯</mi>
-                    <mi>i</mi>
-                    <mtext>mix</mtext>
-                  </msubsup>
-                  <mo>=</mo>
-                  <msubsup>
-                    <mi>𝐯</mi>
-                    <mi>i</mi>
-                    <mrow>
-                      <mo>(</mo>
-                      <mi>l</mi>
-                      <mo>)</mo>
-                    </mrow>
-                  </msubsup>
-                  <msub>
-                    <mi>W</mi>
-                    <mtext>mix</mtext>
-                  </msub>
-                </mrow>
-              </math>
-            </div>
+              <div class="equation">
+    v<sub>i</sub><sup>mix</sup>
+    =
+    v<sub>i</sub><sup>(l)</sup>
+    W<sub>mix</sub>
+  </div>
+
 
           <li>And finally applies the updates:</li>
 
