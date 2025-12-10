@@ -1883,29 +1883,12 @@
 
           <br />
 
-          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-            <mrow>
-              <msubsup>
-                <mi>𝐯</mi>
-                <mi>i</mi>
-                <mtext>mix</mtext>
-              </msubsup>
-            </mrow>
-            <mo>=</mo>
-            <msubsup>
-              <mi>𝐯</mi>
-              <mi>i</mi>
-              <mrow>
-                <mo>(</mo>
-                <mi>l</mi>
-                <mo>)</mo>
-              </mrow>
-            </msubsup>
-            <msub>
-              <mi>W</mi>
-              <mtext>mix</mtext>
-            </msub>
-          </math>
+          <div class="equation">
+    v<sub>i</sub><sup>mix</sup>
+    =
+    v<sub>i</sub><sup>(l)</sup>
+    W<sub>mix</sub>
+  </div>
 
           <br />
 
@@ -2030,7 +2013,7 @@
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance. This
           both follows from universal approximation and has been
-          shown in applications. [<a href="#ref1">11</a>, [REF = LEARNED EQUIVARIANCE]]. To evaluate
+          shown in applications. [<a href="#ref11">11</a>, <a href="#ref12">12</a>]. To evaluate
           whether Strawberry was able to converge to equivariance with normal,
           data-augmented, and our layerwise loss regimes, we calculated the
           equivariance error of the predicted dipoles and the latent vector
@@ -2248,6 +2231,10 @@ SO(3) Equivariant Local Frame GNNs. <i>arXiv preprint.</i>
 
   <li id="ref11">
     <a href="https://www.sciencedirect.com/science/article/pii/S0893608005801315" target="_blank">Leshno, M. et al. (1993).</a> Multilayer feedforward networks with a nonpolynomial activation function can approximate any function. 
+    <i>Neural Networks.</i>
+  </li>
+    <li id="ref12">
+    <a href="https://arxiv.org/abs/2006.16221" target="_blank">Finzi M., et al. (2021).</a> Approximate Equivariance Learning in Neural Networks.
     <i>Neural Networks.</i>
   </li>
 </ol>
