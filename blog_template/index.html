@@ -386,10 +386,12 @@
           <a href="#related_works">Related Works</a><br /><br />
           <a href="#methods">Methods</a><br /><br />
           <a href="#results">Results</a><br /><br />
-          <a href="#evaluation">Evaluation</a><br /><br />
           <a href="#conclusion">Conclusion</a><br /><br />
           <a href="#implications_and_limitations"
             >Implications and limitations</a
+          ><br /><br />
+          <a href="#references"
+            >References</a
           ><br /><br />
         </div>
       </div>
@@ -420,11 +422,11 @@
 
         <p>
           To address this limitation, a number of architectures with built-in
-          equivariance have been proposed such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref2">[2]</a>, EGNN <a href="#ref3">[3]</a>. Despite
+          equivariance have been proposed such as SchNet, PaiNN, EGNN[<a href="#ref1">1</a>, <a href="#ref2">2</a>, <a href="#ref3">3</a>]. Despite
           achieving better performance and more meaningful and accurate physical
           representation, built-in equivariant GNNs are computationally
           expensive, especially when algorithms rely on spherical harmonics or
-          per-edge vector update <a href="#ref4">[4]</a>, <a href="#ref5">[5]</a>.
+          per-edge vector update [<a href="#ref4">4</a>, <a href="#ref5">5</a>].
         </p>
 
         <p>
@@ -447,7 +449,7 @@
         </p>
 
         <p>
-          <b>Our central hypothesis</b> is as follows: A non-equivariant GNN trained
+          <b>Our central hypothesis</b> is: A non-equivariant GNN trained
           with additional rotational augmentation and a penalty for non-equivariant latent
           representations can approximate SO(3) equivariance, and our latent non-equivariance
           penalty will help push the model towards equivariance approximation faster.
@@ -469,12 +471,12 @@
           <li>
             <b>Strawberry</b> – a standard, non-equivariant GNN with the same
             architecture as Vanilla, but trained on rotationally augmented data.
-            We used Superfibonacci sampling to create SO(3) augmentations of our
-            train dataset. <a href="#ref1">[7]</a>
+            We used Super-Fibonacci sampling to create SO(3) augmentations of our
+            train dataset <a href="#ref7">[7]</a>.
           </li>
           <br />
           <li>
-            <b>Chocolate</b> – our equivariant GNN based on EGNN [CITE EGNN] in which internal
+            <b>Chocolate</b> – our equivariant GNN based on EGNN <a href="#ref3">[3]</a> in which internal
             vector features are guaranteed to rotate with rotations of the
             input. It does not rely on spherical harmonics, which would increase
             computational cost by substantial amount, but rather on adding new
@@ -875,7 +877,7 @@
         </p>
         <h3>Rotational and Translational Invariance based GNN models</h3>
 
-        <h4>SchNet</h4> [CITE SCHNET]
+        <h4>SchNet <a href="#ref1">[1]</a> </h4>
         <p>
           This deep learning architecture uses continuous-filter convolution
           layers, rather than message passing algorithms. Continuous-filter
@@ -891,7 +893,7 @@
           equivariance.
         </p>
 
-        <h4>Equivariant Graph Neural Network (EGNN)</h4> [CITE EGNN]
+        <h4>Equivariant Graph Neural Network (EGNN) <a href="#ref3">[3]</a></h4>
         <p>
           This deep learning architecture solves the SE(3) equivariance problem,
           while additionally introducing reflection equivariance, which makes
@@ -903,7 +905,7 @@
           to computing vector updates per edge.
         </p>
 
-        <h4>Polarizable Interaction Neural Network (PaiNN)</h4> [CITE PAINN]
+        <h4>Polarizable Interaction Neural Network (PaiNN) <a href="#ref2">[2]</a></h4>
         <p>
           It is a tensor-based SE(3)-equivariant network designed as a successor
           of SchNet.
@@ -2042,12 +2044,12 @@
           perform a hyperparameter search to find optimal values of λ.
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance. This
-          both follows from universal approximation [LEHSNO 1993] and has been
-          shown in applications.[REF = LEARNED EQUIVARIANCE]. To evaluate
+          both follows from universal approximation and has been
+          shown in applications. [<a href="#ref1">11</a>, [REF = LEARNED EQUIVARIANCE]]. To evaluate
           whether Strawberry was able to converge to equivariance with normal,
           data-augmented, and our layerwise loss regimes, we calculated the
           equivariance error of the predicted dipoles and the latent vector
-          representations over a random sample of molecules with [N] rotations
+          representations over a random sample of molecules with 4 rotations
           applied to them.
         </p>
       </div>
@@ -2056,10 +2058,7 @@
       </div>
     </div>
 
-
-
-		<!-- EVALUATION SECTION -->
-		<div class="content-margin-container" id="evaluation">
+		<div class="content-margin-container" id="results">
 			<div class="margin-left-block"></div>
 		  <div class="main-content-block">
 				<h1>Results</h1>
@@ -2212,54 +2211,59 @@
       <div class="main-content-block">
         <div class="citation" id="references" style="height: auto">
           <br />
-          <span style="font-size: 16px">References:</span><br /><br />
+          <h2>References:</h2><br /><br />
 <ol>
   <li id="ref1"> 
     <a href="https://arxiv.org/abs/1706.08566" target="_blank">Schütt, K. T., et al. (2017).</a> SchNet: A continuous-filter convolutional neural network for modeling quantum interactions.
-    NeurIPS.
+    <i>NeurIPS.</i>
   </li>
 
   <li id="ref2">
     <a href="https://arxiv.org/abs/2102.03150" target="_blank">Schütt, K. T., et al. (2021).</a> Equivariant message passing for the prediction of tensorial properties (PaiNN).
-    ICML. 
+    <i>ICML.</i>
   </li>
 
   <li id="ref3">
     <a href="https://arxiv.org/abs/2102.09844" target="_blank">Satorras, V. G., et al. (2021).</a> E(n) Equivariant Graph Neural Networks.
-    ICML. 
+    <i>ICML.</i> 
   </li>
 
   <li id="ref4">
     <a href="https://arxiv.org/abs/1802.08219" target="_blank">Thomas, N., et al. (2018).</a> Tensor Field Networks: Rotation- and translation-equivariant neural networks for 3D point clouds.
-    ICLR. 
+    <i>ICLR.</i>
   </li>
 
   <li id="ref5">
     <a href="https://arxiv.org/abs/2006.10503" target="_blank">Fuchs, F. B., et al. (2020).</a> SE(3)-Transformers: 3D equivariant attention networks.
-    NeurIPS.
+    <i>NeurIPS.</i>
   </li>
 
   <li id="ref6"> 
     <a href="https://www.nature.com/articles/s41597-021-00882-8" target="_blank">Hoja, J., et al. (2021).</a> QM7-X: A comprehensive dataset of quantum-mechanical properties.
-    Scientific Data.
+    <i>Scientific Data.</i>
   </li>
 
-  <li id="ref7">
-    <a href="https://pubs.acs.org/doi/10.1021/ci00057a005" target="_blank">Weininger, D. (1988).</a> SMILES, a chemical language and information system. J. Chem. Inf. Comput. Sci. 
+    <li id="ref7">
+    <a href="https://openaccess.thecvf.com/content/CVPR2022/papers/Alexa_Super-Fibonacci_Spirals_Fast_Low-Discrepancy_Sampling_of_SO3_CVPR_2022_paper.pdf" target="_blank">Alexa, M. (2022).</a> Super-Fibonacci Spirals: Fast, Low-Discrepancy Sampling of SO(3).
+    <i>CVPR 2022.</i>
   </li>
 
   <li id="ref8">
-    <a href="https://pubs.acs.org/doi/10.1021/ci100050t" target="_blank">Rogers, D., Hahn, M. (2010).</a> Extended-connectivity fingerprints. J. Chem. Inf. Model. 
+    <a href="https://pubs.acs.org/doi/10.1021/ci00057a005" target="_blank">Weininger, D. (1988).</a> SMILES, a chemical language and information system. <i>J. Chem. Inf. Comput. Sci. </i>
   </li>
 
   <li id="ref9">
-    <a href="https://openaccess.thecvf.com/content/CVPR2022/papers/Alexa_Super-Fibonacci_Spirals_Fast_Low-Discrepancy_Sampling_of_SO3_CVPR_2022_paper.pdf" target="_blank">Alexa, M. (2022).</a> Super-Fibonacci Spirals: Fast, Low-Discrepancy Sampling of SO(3).
-    IEEE Xplore.
+    <a href="https://pubs.acs.org/doi/10.1021/ci100050t" target="_blank">Rogers, D., Hahn, M. (2010).</a> Extended-connectivity fingerprints. <i>J. Chem. Inf. Model. </i>
   </li>
 
   <li id="ref10">
     <a href="https://arxiv.org/pdf/2511.07087" target="_blank">Filling, J. P. (2025).</a> Direct Molecular Polarizability Prediction with
-SO(3) Equivariant Local Frame GNNs.
+SO(3) Equivariant Local Frame GNNs. <i>arXiv preprint.</i>
+  </li>
+
+  <li id="ref11">
+    <a href="https://www.sciencedirect.com/science/article/pii/S0893608005801315" target="_blank">Leshno, M. et al. (1993).</a> Multilayer feedforward networks with a nonpolynomial activation function can approximate any function. 
+    <i>Neural Networks.</i>
   </li>
 </ol>
 
