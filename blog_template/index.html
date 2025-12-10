@@ -166,6 +166,51 @@
         height: 150px;
       }
 
+      table.booktabs {
+        width: 100%;
+        border-collapse: collapse;
+        border-top: 2px solid #1f2933;
+        border-bottom: 2px solid #1f2933;
+        margin: 12px 0 20px;
+        font-size: 15px;
+      }
+
+      table.booktabs caption {
+        caption-side: top;
+        font-weight: 600;
+        text-align: left;
+        color: #2c3e50;
+        margin-bottom: 6px;
+      }
+
+      table.booktabs th,
+      table.booktabs td {
+        padding: 10px 12px;
+      }
+
+      table.booktabs thead th {
+        font-weight: 600;
+        border-bottom: 1.5px solid #1f2933;
+        text-align: left;
+      }
+
+      table.booktabs tbody td {
+        border-bottom: 1px solid #dfe7f3;
+      }
+
+      table.booktabs tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.booktabs .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      table.booktabs tbody tr:hover td {
+        background-color: #f6f8fc;
+      }
+
       .layered-paper {
         box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.35), 5px 5px 0 0px #fff,
           5px 5px 1px 1px rgba(0, 0, 0, 0.35), 10px 10px 0 0px #fff,
@@ -402,16 +447,16 @@
         </p>
 
         <p>
-          <b>Central hypothesis</b> is as follows: A non-equivariant GNN trained
-          with additional rotational augmentation can approximate SE(3)
-          equivariance and perform competitively enough while requiring less
-          computational cost.
+          <b>Our central hypothesis</b> is as follows: A non-equivariant GNN trained
+          with additional rotational augmentation and a penalty for non-equivariant latent
+          representations can approximate SO(3) equivariance, and our latent non-equivariance
+          penalty will help push the model towards equivariance approximation faster.
         </p>
 
         <p>
           We decided to not use models that rely on spherical harmonics as they
-          are more likely to be substantially expensive in computation
-          complexity. To evaluate the effectiveness of equivariance learning we
+          are more computationally expensive and RBF expansion is not necessary to test our
+          hypothesis. To evaluate the effectiveness of equivariance learning we
           compared these three cases:
         </p>
 
@@ -424,17 +469,16 @@
           <li>
             <b>Strawberry</b> – a standard, non-equivariant GNN with the same
             architecture as Vanilla, but trained on rotationally augmented data.
-            We used superfibonacci sampling to obtain rotated data from our
-            train dataset. <a href="#ref7">[7]</a>
+            We used Superfibonacci sampling to create SO(3) augmentations of our
+            train dataset. <a href="#ref1">[7]</a>
           </li>
           <br />
           <li>
-            <b>Chocolate</b> – our built-in equivariant GNN in which internal
+            <b>Chocolate</b> – our equivariant GNN based on EGNN [CITE EGNN] in which internal
             vector features are guaranteed to rotate with rotations of the
             input. It does not rely on spherical harmonics, which would increase
             computational cost by substantial amount, but rather on adding new
-            information in form of vector features to each node. It was inspired
-            by PaiNN and EGNN architectures that are described below.
+            information in form of vector features to each node.
           </li>
         </ol>
         <div class="figure-wrapper">
@@ -830,7 +874,8 @@
           embedded in 3D space.
         </p>
         <h3>Rotational and Translational Invariance based GNN models</h3>
-        <h4>SchNet</h4>
+
+        <h4>SchNet</h4> [CITE SCHNET]
         <p>
           This deep learning architecture uses continuous-filter convolution
           layers, rather than message passing algorithms. Continuous-filter
@@ -846,7 +891,7 @@
           equivariance.
         </p>
 
-        <h4>Equivariant Graph Neural Network (EGNN)</h4>
+        <h4>Equivariant Graph Neural Network (EGNN)</h4> [CITE EGNN]
         <p>
           This deep learning architecture solves the SE(3) equivariance problem,
           while additionally introducing reflection equivariance, which makes
@@ -858,7 +903,7 @@
           to computing vector updates per edge.
         </p>
 
-        <h4>Polarizable Interaction Neural Network (PaiNN)</h4>
+        <h4>Polarizable Interaction Neural Network (PaiNN)</h4> [CITE PAINN]
         <p>
           It is a tensor-based SE(3)-equivariant network designed as a successor
           of SchNet.
@@ -1984,33 +2029,17 @@
           representations of intermediate vector features in Strawberry:
         </p>
 
-        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"></math>
+        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+
+        </math>
 
         <p>
           Adding this loss term is tantamount to adding an extra objective. To
           avoid the model getting stuck in a local minimum by predicting a
           trivial dipole (the zero vector) that perfectly satisfies
           equivariance, we scale this additional loss term by a hyperparameter
-          LAMBDA. For future implementations of such a layerwise loss, we will
-          perform a hyperparameter search to find optimal values of lambda.
-        </p>
-
-        <h3>Evaluation</h3>
-        <p>
-          To efficiently generate samples of SO(3) rotation matrices, we
-          implemented the superfibonacci sampling algorithm.[ref]
-        </p>
-      </div>
-      <div class="margin-right-block">
-        ⊗ symbol stands for Kronecker product.
-      </div>
-    </div>
-
-    <div class="content-margin-container" id="results">
-      <div class="margin-left-block"></div>
-      <div class="main-content-block">
-        <h1>Results: Does Strawberry learn to be equivariant?</h1>
-        <p>
+          λ. For future implementations of such a layerwise loss, we will
+          perform a hyperparameter search to find optimal values of λ.
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance. This
           both follows from universal approximation [LEHSNO 1993] and has been
@@ -2021,82 +2050,153 @@
           representations over a random sample of molecules with [N] rotations
           applied to them.
         </p>
+      </div>
+      <div class="margin-right-block">
+        ⊗ symbol stands for Tensor product.
+      </div>
+    </div>
+
+    <div class="content-margin-container" id="results">
+      <div class="margin-left-block"></div>
+      <div class="main-content-block">
+        <h1>Results: Does Strawberry learn to be equivariant?</h1>
+        <p>
+
+        </p>
 
         <p>
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance.
         </p>
       </div>
-      <div class="margin-right-block" style="transform: translate(0%, -100%)"></a
-        >.
+      <div class="margin-right-block" style="transform: translate(0%, -100%)">
       </div>
     </div>
 
 		<!-- EVALUATION SECTION -->
-		<div class="content-margin-container">
-				<div class="margin-left-block">
-				</div>
-		    <div class="main-content-block">
-					<a id="evaluation"></a>
-					<h1>Evaluation</h1>
-					
-					<p>
-						Implementing layerwise losses adds a hard equivariance objective for the non-equivariant model.
-						Data augmentation alone provides a soft objective in favor of equivariance. Here we analyze
-						compare Chocolate's performance to all three training schedules of Strawberry.
+		<div class="content-margin-container" id="evaluation">
+			<div class="margin-left-block"></div>
+		  <div class="main-content-block">
+				<h1>Evaluation</h1>
+				
+				<p>
+					Implementing layerwise losses adds an equivariance regularizer for the non-equivariant model.
+					Data augmentation alone provides a soft objective in favor of equivariance. Here we analyze
+					compare Chocolate's performance to all three training schedules of Strawberry.
+				</p>
+				<h3>RMSE Accuracy on Test Set</h3>
+        <table class="booktabs">
+          <caption>Dipole prediction on QM7-X (test set)</caption>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Training regime</th>
+              <th class="num">MSE</th>
+              <th class="num">RMSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Chocolate</td>
+              <td>Equivariant baseline</td>
+              <td class="num">0.0044</td>
+              <td class="num">0.0670</td>
+            </tr>
+            <tr>
+              <td>Strawberry</td>
+              <td>None</td>
+              <td class="num">0.0071</td>
+              <td class="num">0.0840</td>
+            </tr>
+            <tr>
+              <td>Strawberry</td>
+              <td>Superfibonacci end-layer loss</td>
+              <td class="num">0.0090</td>
+              <td class="num">0.0950</td>
+            </tr>
+            <tr>
+              <td>Strawberry</td>
+              <td>Superfibonacci intermediate layer loss</td>
+              <td class="num">0.0097</td>
+              <td class="num">0.0982</td>
+            </tr>
+          </tbody>
+        </table>
+				<p>
+					The obtained RMSE was not state of the art, but the models did demonstrate some predictive ability.
+          We were surprised to see that the per-layer equivariance loss hurt the prediction RMSE, suggesting the simple MSE 
+	          regularizer may have encouraged latent collapse instead of learning equivariance.
 					</p>
-					<h3>RMSE Accuracy on Test Set</h3>
-					
-					<h3>Latent Geometry</h3>
-					To get a sense of the model's latent geometry, we performed PCA analysis on 
-					<div class="main-content-block">
-					<img src="./images/latent_pca_chocolate_none_checkpoint_epoch_20.png" width=512px/>
-					</div>
-					<div class="margin-right-block">
-							PCA analysis for latent vectors in Chocolate after training without any augmentations
-					</div>
-					</div>
-					
+	    	</div>
+				<div class="margin-right-block"></div>
+			</div>
 
-					<div class="main-content-block">
-					<img src="./images/latent_pca_strawberry_superfib_intermediate_checkpoint_epoch_20.png" width=512px/>
-					</div>
-					<div class="margin-right-block">
-								PCA analysis for latent vectors in Strawberry after training with intermediate layerwise
-								losses
-					</div>
-					</div>
-							
-
-          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-              <mrow>
-                <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>y</mi>
-                </mrow>
-                <mo>/</mo>
-                <mrow>
-                  <mo>&#x2202;</mo>
-                  <mi>x</mi>
-                </mrow>
-              </mrow>
-              <mo>=</mo>
-              <mi>x</mi>
-            </math>
-          <br>
-          
-
-		    </div>
-		    <div class="margin-right-block" style="transform: translate(0%, -100%);"> 
-          Interestingly, Plato also asked if X does Y, in <a href="#ref_1">[1]</a>.
-		    </div>
-		</div>
+			<div class="content-margin-container">
+				<div class="margin-left-block"></div>
+				<div class="main-content-block">
+					<h3>Training Loss Curves</h3>
+					<p>
+						Training and validation loss trajectories for Chocolate and Strawberry under each regime. Strawberry with
+            augmentation and intermediate equivariance penalties converged more slowly and to a higher loss.  The
+            validation trajectories were also more chaotic than expected, even with implementation of learning rate
+            scheduling.  In the future, we will implement smaller batch sizes and train for more epochs with an even
+            lower learning rate.
+					</p>
+					<img src="./images/loss_curves_grid.svg" width="512" />
+				</div>
+				<div class="margin-right-block">
+					Training/validation loss across augmentation and layerwise-loss schedules
+				</div>
+			</div>
+	
+			<div class="content-margin-container">
+				<div class="margin-left-block"></div>
+				<div class="main-content-block">
+	        <h3>Per-Layer Equivariance</h3>
+	        <p>To examine whether each model learned an equivariant embedding, we constructed violin plots 
+	          of equivariance errors for latent vectors in each model over an 'orbit' (64 Superfibonacci SO(3) rotation 
+          matrix samples), averaged over the validation set: 
+        </p>
+					<img src="./images/equivariance_violin_grid.svg" width="512" />
+        <p>
+          To check if the equivariance penalty collapsed vector magnitudes, we also plotted per-layer mean vector norms.
+        </p>
+					<img src="./images/equivariance_norms_grid.svg" width="512" />
+        <p style="font-size: 14px; color: #555; text-align: center; margin-top: 4px;">
+          Per-layer mean vector norms
+        </p>
+        <p>
+          As expected, Chocolate, which has an equivariant structure, has equivariance errors on the order
+          of floating point noise.  Vanilla and Strawberry with augmentation have comparable equivariance losses, with
+          Strawberry having slightly lower errors.  Unexpectedly, the equivariance regularizer seemed to work on the
+          first two layers Strawberry when added, but it mostly failed on the last layer.  We plotted the vector norms,
+          and the clear difference between the mean vector norms for the first two and last layer indicate that the
+          layerwise loss encouraged Strawberry to collapse representations.
+          For future implementations, we believe that normalizing the simple MSE objective may help to
+          solve this collapsing norm problem.
+        </p>
+				</div>
+	     			<div class="margin-right-block">
+					Violin plots for per-layer equivariance and per-layer mean vector norms.
+				</div>
+			</div>
+  
 
     <div class="content-margin-container" id="conclusion">
       <div class="margin-left-block"></div>
       <div class="main-content-block">
         <h1>Conclusion</h1>
         <p>
+          Due to time constraints and the computational intensity of training multiple GNN variants on QM7-X, we did not
+          perform ablation studies on critical hyperparameters (e.g., λ strength, number of rotational augmentations, 
+          hidden dimension, or depth). As a result, our results should be interpreted as testing one instance of 
+          our hypothesis rather than an exhaustive exploration of the space.
+          The result, however, that the layerwise equivariance penalty collapses the vector channels
+          rather than enforcing rotation consistency is still useful: it suggests that naïve MSE equivariance
+          regularization is unstable in non-equivariant architectures. The observed behavior was consistent across
+          multiple seeds and training runs, giving us confidence that this phenomenon is not due to a specific
+          hyperparameter choice.
+
           We compared three models—Vanilla, Strawberry, and Chocolate—to
           investigate whether a non-equivariant GNN trained with rotational
           augmentation can approximate the performance of a built-in equivariant
@@ -2104,12 +2204,6 @@
           methods and experiments focus on the trade-offs between inductive bias
           (equivariance by design) and computational efficiency (equivariance
           learned through data and auxiliary losses).
-        </p>
-        <p>
-          In the full report, this section can summarize quantitative results,
-          highlight whether the central hypothesis is supported, and connect
-          back to the broader implications for molecular modeling and
-          equivariant deep learning.
         </p>
       </div>
       <div class="margin-right-block"></div>
@@ -2126,7 +2220,7 @@
           organic molecules. Although small organic molecules are important in
           research, it is quite difficult to extrapolate our results to bigger
           molecular systems such as RNA and proteins, which are central in drug
-          development field.
+          development field. 
         </p>
       </div>
       <div class="margin-right-block"></div>
