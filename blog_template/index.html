@@ -447,6 +447,7 @@
           defines polarity and influences properties like membrane permeability and 
           solubility.  A high quality model can help avoid running computationally expensive Density 
           Functional Theory (DFT) calculations and is key to predicting how a molecule will absorb infrared light.
+       
         </p>
 
         <p>
@@ -2158,7 +2159,7 @@
 				<div class="main-content-block">
 					<h3>Predicted vs. True Dipoles</h3>
 					<p>
-						Scatter plots of predicted versus ground-truth dipole components (x, y, z stacked) for each model variant. The equivariant Chocolate model hugs the identity line; the layerwise regularizer worsens scatter.
+						To visualize predictive performance, we plotted predicted versus ground-truth dipole components for all model variants (Fig. 4). The Chocolate model produces the tightest clustering around the identity line, consistent with its lowest RMSE and built-in equivariance. Both Vanilla and Strawberry + augmentation show broader scatter, indicating less stable vector predictions. Adding layerwise equivariance losses worsens the spread further, reflecting the degradation in accuracy observed in the quantitative metrics. Overall, these plots reinforce that the simple equivariance penalty does not translate into improved dipole prediction and can even destabilize the learned vector representations.
 					</p>
 					<img src="./images/dipole_pred_vs_true_grid.png" width="512" />
 				</div>
@@ -2170,18 +2171,22 @@
 			<div class="content-margin-container">
 				<div class="margin-left-block"></div>
 				<div class="main-content-block">
-	        <h3>Per-Layer Equivariance</h3>
-	        <p>To examine whether each model learned an equivariant embedding, we constructed violin plots 
-	          of equivariance errors for latent vectors in each model over an 'orbit' (64 Superfibonacci SO(3) rotation 
-          matrix samples), averaged over the validation set: 
+	        <h3>Layerwise Equivariance Analysis</h3>
+	        <p>To quantify how well each model learned rotationally stable representations, we computed the 
+            equivariance error of each latent vector over 64 SO(3) rotations sampled using a Superfibonacci 
+            grid and plotted distributions as violin plots.
         </p>
 					<img src="./images/equivariance_violin_grid.svg" width="512" />
         <p>
-          To check if the equivariance penalty collapsed vector magnitudes, we also plotted per-layer mean vector norms.
+          As seen from violin grins, Chocolate demonstrates near-perfect equivariance at all layers. Vanilla and Strawberry with augmentation 
+          show similar distributions with substantial equivariance error, though augmentation slightly improves stability in early layers. 
+          Unexpectedly, strawberry + augmentation + layerwise losses show dramatic improvement at layer 0 and 1, but layer 2 exhibits persistent high error, 
+          contrary to the desired effect of the regularizer. This failure mode is strongly suggestive of representational collapse in the earlier layers, 
+          which prompted us to examine mean vector norms.
         </p>
 					<img src="./images/equivariance_norms_grid.svg" width="512" />
         <p style="font-size: 14px; color: #555; text-align: center; margin-top: 4px;">
-          Per-layer mean vector norms
+          Vector Norm Analysis
         </p>
         <p>
           As expected, Chocolate, which has an equivariant structure, has equivariance errors on the order
@@ -2205,23 +2210,10 @@
       <div class="main-content-block">
         <h1>Conclusion</h1>
         <p>
-          Due to time constraints and the computational intensity of training multiple GNN variants on QM7-X, we did not
-          perform ablation studies on critical hyperparameters (e.g., λ strength, number of rotational augmentations, 
-          hidden dimension, or depth). As a result, our results should be interpreted as testing one instance of 
-          our hypothesis rather than an exhaustive exploration of the space.
-          The result, however, that the layerwise equivariance penalty collapses the vector channels
-          rather than enforcing rotation consistency is still useful: it suggests that naïve MSE equivariance
-          regularization is unstable in non-equivariant architectures. The observed behavior was consistent across
-          multiple seeds and training runs, giving us confidence that this phenomenon is not due to a specific
-          hyperparameter choice.
-
-          We compared three models - Vanilla, Strawberry, and Chocolate - to
-          investigate whether a non-equivariant GNN trained with rotational
-          augmentation can approximate the performance of a built-in equivariant
-          architecture on vector-valued properties like dipole moments. Our
-          methods and experiments focus on the trade-offs between inductive bias
-          (equivariance by design) and computational efficiency (equivariance
-          learned through data and auxiliary losses).
+          Our results show that while rotational augmentation provides a weak equivariance prior, it does not approach the stability or accuracy of an equivariant architecture like Chocolate. More notably, introducing per-layer equivariance penalties in Strawberry leads to a failure mode: representations in early layers collapse, yielding low equivariance error only because the latent vectors shrink toward zero. This phenomenon appeared consistently across seeds and training attempts, indicating that it is not an artifact of specific hyperparameters but a structural issue with the regularizer.
+</p>
+<p>
+Because our experiments were constrained by compute and time, we did not perform systematic sweeps over λ, augmentation multiplicity, hidden size, or model depth. Therefore, our study should be viewed as evaluating a single point in a larger design space. Nonetheless, the emergence of latent collapse is itself an informative result—it implies that naïve equivariance penalties may be fundamentally incompatible with non-equivariant message-passing networks unless carefully normalized or re-designed.
         </p>
       </div>
       <div class="margin-right-block"></div>
