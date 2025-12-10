@@ -2038,32 +2038,8 @@
           avoid the model getting stuck in a local minimum by predicting a
           trivial dipole (the zero vector) that perfectly satisfies
           equivariance, we scale this additional loss term by a hyperparameter
-<<<<<<< HEAD
           λ. For future implementations of such a layerwise loss, we will
           perform a hyperparameter search to find optimal values of λ.
-=======
-          LAMBDA. For future implementations of such a layerwise loss, we will
-          perform a hyperparameter search to find optimal values of lambda.
-        </p>
-
-        <h3>Augmentation</h3>
-        <p>
-          To efficiently generate samples of SO(3) rotation matrices, we
-          implemented the superfibonacci sampling algorithm.[ref]
-        </p>
-      </div>
-      <div class="margin-right-block">
-        Margin note that clarifies some detail #main-content-block for intro
-        section.
-      </div>
-    </div>
-
-    <div class="content-margin-container" id="results">
-      <div class="margin-left-block"></div>
-      <div class="main-content-block">
-        <h1>Results: Does Strawberry learn to be equivariant?</h1>
-        <p>
->>>>>>> 1c4efbf (Some more changes)
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance. This
           both follows from universal approximation [LEHSNO 1993] and has been
