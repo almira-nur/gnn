@@ -406,19 +406,14 @@
       <div class="main-content-block">
         <h2>Introduction</h2>
         <p>
-          A molecule's response to electric field perturbations (light) is the fundamental method for the characterization
-          of its properties.  Chemists use this information to confirm that a desired molecule has been successfuly
-          prepared, predict how a molecule or material will behave, and to optimize the structure of future molecules.
-          The state of the art models for predicting these perturbations are equivariant graph neural networks and
-          transformers.  Models with built in equivariance can access a small subset of functions and are usually highly
-          specialized to specific problems, so their transferability to new problems is low.  These models are also
-          more expensive, because they require computationally expensive vector transforms.  Models that use inductive
-          biases to approximate equivariance is an emerging field of research: with appropriate data, loss, and
-          minimal architecture, non-equivariant models can learn to approximate equivariance, often at lower cost and
-          complexity.  We set out to test whether a simple inductive bias—a regularization term that encouraged a
-          non-equivariant model to learn an approximation of SO(3) equivariance in its latent geometry—could improve its
-          ability to predict a molecule's dipole moment, the first order term in its response to light.
-
+ A molecule’s response to light helps verify its synthesis and predict its reactivity. Understanding what this 
+          response looks like for new molecules, such as a drug candidate, can thus be an extremly powerful tool for 
+          chemists. Unfortunately, while we have partial differential equations that can be used to compute its 
+          behavior, finding the terms of this equation apriori without using poorly scaling quantum simulations
+          is a challenging and largely open problem. In this work, 
+          we build on equivariant physics-informed models to predict the leading term for this equation, called the dipole.
+          Our contributions present an important next step in the path towards computationally tractable, generalizable,
+          and scalable molecular property prediction.
         </p>
         <p>
           A Graph Neural Network is one of the most suitable
@@ -2211,12 +2206,13 @@
         <h1>Implications and limitations</h1>
 
         <p>
-          As one of the main limitations of the project we would highlight that
-          the hypothesis was only tested with a dataset that contains small
-          organic molecules. Although small organic molecules are important in
-          research, it is quite difficult to extrapolate our results to bigger
-          molecular systems such as RNA and proteins, which are central in drug
-          development field. 
+          Training models to approximately understand physics constraints through data augmentation and equivariance
+          regularization is an active area of research.  Our work demonstrates that geometric regularization of a 
+          model's latent representation can be implemented with very simple terms, customizable to any symmetry of
+          interest.  We also demonstrated, however, that these regularizations can be harmful to a model's quality when
+          a push towards a desired physical constraint is in local tension with the prediction task.  While not needing the
+          same amount of hard-coded structure as a hard imposition of equivariance upon a model, this tension must be
+          recognized and mitigated.
         </p>
       </div>
       <div class="margin-right-block"></div>
