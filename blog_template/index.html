@@ -405,47 +405,53 @@
       <div class="margin-left-block"></div>
       <div class="main-content-block">
         <h2>Introduction</h2>
-
         <p>
-          A Graph Neural Network is one of the most naturally suitable
+          A molecule's response to electric field perturbations (light) is the fundamental method for the characterization
+          of its properties.  Chemists use this information to confirm that a desired molecule has been successfuly
+          prepared, predict how a molecule or material will behave, and to optimize the structure of future molecules.
+          The state of the art models for predicting these perturbations are equivariant graph neural networks and
+          transformers.  Models with built in equivariance can access a small subset of functions and are usually highly
+          specialized to specific problems, so their transferability to new problems is low.  These models are also
+          more expensive, because they require computationally expensive vector transforms.  Models that use inductive
+          biases to approximate equivariance is an emerging field of research: with appropriate data, loss, and
+          minimal architecture, non-equivariant models can learn to approximate equivariance, often at lower cost and
+          complexity.  We set out to test whether a simple inductive bias—a regularization term that encouraged a
+          non-equivariant model to learn an approximation of SO(3) equivariance in its latent geometry—could improve its
+          ability to predict a molecule's dipole moment, the first order term in its response to light.
+
+        </p>
+        <p>
+          A Graph Neural Network is one of the most suitable
           architectures to represent molecular data, where a node corresponds to
           an atom and an edge corresponds to a chemical bond. Because of this
-          structural alignment, there has been immense research done on using
-          GNN to work with molecular data in various applications like property
+          structural alignment, GNNs are the primary model architecture used for
+          molecular property
           prediction, organic retrosynthesis, and protein-ligand binding.
-          However, classic GNNs do not inherently encode and guarantee one of
+          However, classic GNNs do not inherently guarantee one of
           the central properties of molecules - rotational and translational
-          (SE(3)) equivariance. Although scalar observable only require for the
-          model to be invariant to rotation and translation, vector quantities
-          require equivariance.
+          (SE(3)) equivariance.
         </p>
 
         <p>
           To address this limitation, a number of architectures with built-in
-          equivariance have been proposed such as SchNet, PaiNN, EGNN[<a href="#ref1">1</a>, <a href="#ref2">2</a>, <a href="#ref3">3</a>]. Despite
+          equivariance have been designed, such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref2">[2]</a>, EGNN <a href="#ref3">[3]</a>. Despite
           achieving better performance and more meaningful and accurate physical
           representation, built-in equivariant GNNs are computationally
           expensive, especially when algorithms rely on spherical harmonics or
-          per-edge vector update [<a href="#ref4">4</a>, <a href="#ref5">5</a>].
+          per-edge vector updates <a href="#ref4">[4]</a>, <a href="#ref5">[5]</a>.
         </p>
 
         <p>
-          This raises an important question of effectiveness and design
-          trade-off: Can a carefully designed non-equivariant GNN, trained on
-          synthetically augmented data, learn equivariance and achieve similar
-          results, while requiring less computations? To investigate this
-          hypothesis, we designed a set of models to predict dipole moment of
-          small organic molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction
-          is a particularly suitable benchmark for this case as it is a
-          3D-vector quantity; as molecule gets rotated the output should rotate
-          in the same exact direction while retaining magnitude. Dipole moment is 
+          To investigate our
+          hypothesis, we designed a set of models to predict the dipole moment of
+          small molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction
+          is a particularly suitable benchmark as it is a
+          vector quantity; as a molecule gets rotated, the model output should rotate
+          in the same exact direction while retaining magnitude. The dipole moment is 
           essential in determining how charge is spread out in a molecule, which 
           defines polarity and influences properties like membrane permeability and 
-          solubility. Knowing dipole moment can fasten estimation of polarity-based 
-          properties, therefore helps to avoid running computationally expensive Density 
-          Functional Theory (DFT), which is used for accurate dipole moment calculations. 
-          On top of that, dipole moment calculations help generate infra-red (IR) spectra, 
-          which enables monitoring reactions in real-time.
+          solubility.  A high quality model can help avoid running computationally expensive Density 
+          Functional Theory (DFT) calculations and is key to predicting how a molecule will absorb infrared light.
         </p>
 
         <p>
@@ -456,9 +462,7 @@
         </p>
 
         <p>
-          We decided to not use models that rely on spherical harmonics as they
-          are more computationally expensive and RBF expansion is not necessary to test our
-          hypothesis. To evaluate the effectiveness of equivariance learning we
+          To evaluate the effectiveness of equivariance learning we
           compared these three cases:
         </p>
 
@@ -476,11 +480,9 @@
           </li>
           <br />
           <li>
-            <b>Chocolate</b> – our equivariant GNN based on EGNN <a href="#ref3">[3]</a> in which internal
+            <b>Chocolate</b> – our equivariant GNN baseline based on EGNN [CITE EGNN] in which internal
             vector features are guaranteed to rotate with rotations of the
-            input. It does not rely on spherical harmonics, which would increase
-            computational cost by substantial amount, but rather on adding new
-            information in form of vector features to each node.
+            input.
           </li>
         </ol>
         <div class="figure-wrapper">
@@ -2117,7 +2119,7 @@
 					<h3>Training Loss Curves</h3>
 					<p>
 						Training and validation loss trajectories for Chocolate and Strawberry under each regime. Strawberry with
-            augmentation and intermediate equivariance penalties converged more slowly and to a higher loss.  The
+	            augmentation and intermediate equivariance penalties converged more slowly and to a higher loss.  The
             validation trajectories were also more chaotic than expected, even with implementation of learning rate
             scheduling.  In the future, we will implement smaller batch sizes and train for more epochs with an even
             lower learning rate.
@@ -2128,7 +2130,21 @@
 					Training/validation loss across augmentation and layerwise-loss schedules
 				</div>
 			</div>
-	
+
+			<div class="content-margin-container" style="align-items: flex-start;">
+				<div class="margin-left-block"></div>
+				<div class="main-content-block">
+					<h3>Predicted vs. True Dipoles</h3>
+					<p>
+						Scatter plots of predicted versus ground-truth dipole components (x, y, z stacked) for each model variant. The equivariant Chocolate model hugs the identity line; the layerwise regularizer worsens scatter.
+					</p>
+					<img src="./images/dipole_pred_vs_true_grid.png" width="512" />
+				</div>
+				<div class="margin-right-block">
+					2×2 grid: Vanilla, Strawberry+Aug, Strawberry+Aug+Layerwise, Chocolate
+				</div>
+			</div>
+		
 			<div class="content-margin-container">
 				<div class="margin-left-block"></div>
 				<div class="main-content-block">

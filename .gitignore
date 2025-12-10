@@ -222,3 +222,4 @@ checkpoints/*.pt
 *.pt
 mini_100_batchsize_64_hidden_dim_128/*.pt
 mini_*
+blog_template/images/dipole_pred_vs_true_grid.svg
