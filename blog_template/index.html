@@ -406,14 +406,17 @@
       <div class="main-content-block">
         <h2>Introduction</h2>
         <p>
- A molecule’s response to light helps verify its synthesis and predict its reactivity. Understanding what this 
-          response looks like for new molecules, such as a drug candidate, can thus be an extremly powerful tool for 
-          chemists. Unfortunately, while we have partial differential equations that can be used to compute its 
-          behavior, finding the terms of this equation apriori without using poorly scaling quantum simulations
-          is a challenging and largely open problem. In this work, 
-          we build on equivariant physics-informed models to predict the leading term for this equation, called the dipole.
-          Our contributions present an important next step in the path towards computationally tractable, generalizable,
-          and scalable molecular property prediction.
+A molecule's response to light helps verify its synthesis and predict its reactivity. Understanding what this response 
+looks like for new molecules, such as a drug candidate, can thus be an extremely powerful tool for chemists. 
+Unfortunately, while we have differential equations that can be used to compute its behavior, finding the terms of this 
+equation apriori require extensive quantum simulations that are computationally prohibitive for important applications 
+such as high-throughput drug screening. In this work, we built on equivariant physics-informed models by creating three
+models to predict the 
+leading term for this equation, called the dipole. We aimed to show that geometric regularization can steer the latent 
+representation toward the correct physical symmetries and improve generalizability, though we uncovered a potential
+pitfall when objectives that pull the model towards equivariance can pull it away from accurate prediction.
+Our contributions present an important next step in the path towards computationally tractable, 
+generalizable, and scalable molecular property prediction.
         </p>
         <p>
           A Graph Neural Network is one of the most suitable
@@ -923,7 +926,9 @@
           cheap process that does not significantly add up to cost.
         </p>
       </div>
-      <div class="margin-right-block">Interestingly, <a href="#ref_10">[10]</a> was published recently, where authors used GNN architecture with SO(3) equivariance embedded through local coordinates to predict the tensorial response properties of molecules, including dipole moment. This shows that it is an active field of research that is interesting in chemistry. </div>
+      <div class="margin-right-block">Another method <a href="#ref_10">[10]</a> was published recently, where authors 
+        used GNN architecture with SO(3) equivariance embedded through local coordinates to predict the tensorial 
+        response properties of molecules, including dipole moment. </div>
     </div>
 
     <div class="content-margin-container" id="methods">
@@ -1451,7 +1456,7 @@
         </p>
 
         <p>
-          Strawberry, however, uses a slightly different layer architecture. As
+          Strawberry and Vanilla, however, use a slightly different layer architecture. As
           input, instead of zero initialization, as is used in Chocolate,
           information about the molecular geometry is given through using atomic
           position vectors as the vector features of the first layer:
@@ -2034,9 +2039,36 @@
           representations of intermediate vector features in Strawberry:
         </p>
 
-        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
-
-        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mi>L</mi><msub><mi></mi><mrow><mi>eq</mi></mrow></msub>
+    <mo>=</mo>
+    <mfrac><mn>1</mn><mi>N</mi></mfrac>
+    <munderover>
+      <mo>&#8721;</mo>
+      <mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow>
+      <mi>N</mi>
+    </munderover>
+    <munderover>
+      <mo>&#8721;</mo>
+      <mrow><mi>l</mi><mo>=</mo><mn>1</mn></mrow>
+      <mi>L</mi>
+    </munderover>
+    <msup>
+      <mfenced>
+        <mrow>
+          <msub><mi>h</mi><mi>l</mi></msub>
+          <mo>(</mo><mi>R</mi><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo>
+          <mo>&#x2212;</mo>
+          <mi>R</mi>
+          <msub><mi>h</mi><mi>l</mi></msub>
+          <mo>(</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo>
+        </mrow>
+      </mfenced>
+      <mn>2</mn>
+    </msup>
+  </mrow>
+</math>
 
         <p>
           Adding this loss term is tantamount to adding an extra objective. To
