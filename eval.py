@@ -248,18 +248,8 @@ def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
         squeeze=False,
     )
 
-    # Use shared limits to make comparisons visually cleaner
-    all_vals = []
-    for _, _, curves in entries:
-        _, t_loss, v_loss = curves
-        all_vals.extend(t_loss)
-        all_vals.extend(v_loss)
-    if all_vals:
-        y_min, y_max = min(all_vals), max(all_vals)
-        y_pad = 0.05 * (y_max - y_min + 1e-9)
-        shared_ylim = (y_min - y_pad, y_max + y_pad)
-    else:
-        shared_ylim = None
+    # Let each subplot pick its own y-limits so curves are not forced to share an axis range.
+    shared_ylim = None
 
     for idx, (m, a, curves) in enumerate(entries):
         row, col = divmod(idx, ncols)
@@ -290,14 +280,12 @@ def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
             alpha=0.9,
         )
         wrapped_title = textwrap.fill(f"{m.title()} with {augment_title(a)}{title_suffix}", width=28)
-        ax.set_title(wrapped_title)
+        ax.set_title(wrapped_title, pad=8)
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         if LOG_Y_SCALE:
             ax.set_yscale("log")
-        if shared_ylim and not LOG_Y_SCALE:
-            ax.set_ylim(*shared_ylim)
         ax.legend(frameon=True, fontsize="small")
 
     for ax in axes.flatten()[n:]:
@@ -305,7 +293,7 @@ def plot_grid(curves_dict, grid_base: str, title_suffix: str = ""):
 
     sns.despine()
     fig.tight_layout()
-    fig.subplots_adjust(hspace=0.35, wspace=0.28)
+    fig.subplots_adjust(hspace=0.65, wspace=0.35)
     fig.savefig(FIG_ROOT / f"{grid_base}.png", dpi=300, bbox_inches="tight")
     fig.savefig(FIG_ROOT / f"{grid_base}.svg", bbox_inches="tight")
     plt.close(fig)
