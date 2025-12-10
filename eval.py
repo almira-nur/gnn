@@ -6,6 +6,7 @@ import textwrap
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from matplotlib.ticker import MaxNLocator
+import numpy as np
 from tqdm import tqdm
 import seaborn as sns
 import torch
@@ -40,6 +41,12 @@ LINE_WIDTH = 2.2
 MARKER_SIZE = 7
 MARKER_EDGE_WIDTH = 0.8
 PALETTE = sns.color_palette("Set2", 2)
+PRED_SCATTER_ORDER = [
+    ("strawberry", "none", "Vanilla (no aug)"),
+    ("strawberry", "superfib_end", "Strawberry + Augmentation"),
+    ("strawberry", "superfib_intermediate", "Strawberry + Aug + Layerwise Loss"),
+    ("chocolate", "none", "Chocolate (Equivariant)"),
+]
 
 DATASET_TAG = "mini_200_conf_qm7x_processed_train"
 CHECKPOINT_ROOT = Path("checkpoints")
@@ -93,6 +100,85 @@ def build_model(model_type: str):
     if model_type == "strawberry":
         return Strawberry(hidden_dim=HIDDEN_DIM, n_layers=N_LAYERS)
     raise ValueError(f"Unknown model type: {model_type}")
+
+
+def latest_checkpoint(ckpt_dir: Path) -> Path | None:
+    ckpts = sorted(ckpt_dir.glob("checkpoint_epoch_*.pt"),
+                   key=lambda p: int(p.stem.split("_")[-1]))
+    return ckpts[-1] if ckpts else None
+
+
+def collect_pred_true(model, loader):
+    preds, trues = [], []
+    model.eval()
+    with torch.inference_mode():
+        for batch in tqdm(loader, leave=False):
+            batch = batch.to(DEVICE)
+            z = batch.z
+            pos = batch.pos
+            dip = batch.dip
+            b = batch.batch
+            B = b.max().item() + 1
+            dip = dip.view(B, 3)
+
+            edge_index = build_block_complete_graph(b)
+            edge_index, _ = remove_self_loops(edge_index)
+
+            pred, _ = model(z=z, pos=pos, edge_index=edge_index, batch=b)
+            preds.append(pred.detach().cpu())
+            trues.append(dip.detach().cpu())
+    model.train()
+    if not preds:
+        return None, None, None
+    pred_arr = torch.cat(preds, dim=0).numpy().reshape(-1)
+    true_arr = torch.cat(trues, dim=0).numpy().reshape(-1)
+    rmse = float(np.sqrt(np.mean((pred_arr - true_arr) ** 2)))
+    return true_arr, pred_arr, rmse
+
+
+def plot_pred_true_grid(entries, outfile_base: str = "dipole_pred_vs_true_grid"):
+    fig, axes = plt.subplots(2, 2, figsize=(11, 10), squeeze=False)
+    for ax, entry in zip(axes.flatten(), entries):
+        if entry is None:
+            ax.axis("off")
+            continue
+        label, true_arr, pred_arr, rmse = entry
+        sns.scatterplot(
+            x=true_arr,
+            y=pred_arr,
+            ax=ax,
+            s=18,
+            alpha=0.35,
+            edgecolor="none",
+            color=PALETTE[0],
+        )
+        lo = min(true_arr.min(), pred_arr.min())
+        hi = max(true_arr.max(), pred_arr.max())
+        pad = 0.05 * (hi - lo + 1e-12)
+        ax.plot([lo - pad, hi + pad], [lo - pad, hi + pad], color="#444", linestyle="--", linewidth=1.3)
+        ax.set_xlim(lo - pad, hi + pad)
+        ax.set_ylim(lo - pad, hi + pad)
+        ax.set_xlabel("True dipole component")
+        ax.set_ylabel("Predicted dipole component")
+        wrapped_title = textwrap.fill(label, width=26)
+        ax.set_title(wrapped_title, pad=8)
+        ax.text(
+            0.05,
+            0.92,
+            f"RMSE = {rmse:.3f}",
+            transform=ax.transAxes,
+            fontsize="medium",
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#BBBBBB"),
+        )
+    for ax in axes.flatten()[len(entries):]:
+        ax.axis("off")
+    sns.despine()
+    fig.tight_layout()
+    fig.subplots_adjust(hspace=0.42, wspace=0.35)
+    fig.savefig(FIG_ROOT / f"{outfile_base}.png", dpi=300, bbox_inches="tight")
+    fig.savefig(FIG_ROOT / f"{outfile_base}.svg", bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved prediction scatter grid to {FIG_ROOT / (outfile_base + '.png')} and .svg")
 
 def evaluate_loader(loader, model):
     mse = nn.MSELoss()
@@ -339,3 +425,37 @@ if PLOT_RECOMPUTED and recomputed_curves:
 
 if not all_curves and not recomputed_curves:
     print("No curves plotted; no checkpoints found for any model/augment combination.")
+
+# ---------------------------------------------------------
+# Predicted vs. true dipole components scatter (2x2 grid)
+# ---------------------------------------------------------
+pred_entries = []
+for model_type, augment_type, label in PRED_SCATTER_ORDER:
+    ckpt_dir = checkpoint_dir(model_type, augment_type)
+    ckpt_path = latest_checkpoint(ckpt_dir)
+    if ckpt_path is None:
+        print(f"Skipping {label}: no checkpoint found in {ckpt_dir}")
+        pred_entries.append(None)
+        continue
+    ckpt = torch.load(ckpt_path, map_location=DEVICE)
+    state_dict = ckpt.get("model_state_dict")
+    if state_dict is None:
+        print(f"Skipping {label}: checkpoint {ckpt_path} missing model_state_dict")
+        pred_entries.append(None)
+        continue
+    model = build_model(model_type).to(DEVICE)
+    model.load_state_dict(state_dict)
+    true_arr, pred_arr, rmse = collect_pred_true(model, val_loader)
+    if true_arr is None:
+        print(f"Skipping {label}: no predictions collected")
+        pred_entries.append(None)
+        continue
+    pred_entries.append((label, true_arr, pred_arr, rmse))
+
+if any(entry is not None for entry in pred_entries):
+    # Ensure we always have 4 slots for the 2x2 grid
+    while len(pred_entries) < 4:
+        pred_entries.append(None)
+    plot_pred_true_grid(pred_entries)
+else:
+    print("No prediction-vs-true plots generated (no checkpoints with predictions).")

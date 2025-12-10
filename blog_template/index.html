@@ -8,18 +8,6 @@
       body {
         background-color: #f5f9ff;
       }
-      .equation {
-  text-align: center;
-  font-family: "Times New Roman", serif;
-  font-size: 1.05rem;
-  white-space: nowrap;
-}
-
-.equation sub,
-.equation sup {
-  font-size: 0.75em;
-  line-height: 0;
-}
 
       math {
         font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", serif;
@@ -417,38 +405,48 @@
       <div class="margin-left-block"></div>
       <div class="main-content-block">
         <h2>Introduction</h2>
-
         <p>
-          A Graph Neural Network is one of the most naturally suitable architectures to 
-          represent molecular data, where a node corresponds to an atom and an edge corresponds to a 
-          chemical bond. Because of this structural alignment, there has been immense research on using 
-          GNNs for molecular applications like property prediction, organic retrosynthesis, and protein - ligand 
-          binding. However, classic GNNs do not inherently encode one of the central properties of molecules - rotational 
-          and translational (SE(3)) equivariance. Although scalar observables only require invariance to rotation and translation, 
-          vector quantities require equivariance.
+ A molecule’s response to light helps verify its synthesis and predict its reactivity. Understanding what this 
+          response looks like for new molecules, such as a drug candidate, can thus be an extremly powerful tool for 
+          chemists. Unfortunately, while we have partial differential equations that can be used to compute its 
+          behavior, finding the terms of this equation apriori without using poorly scaling quantum simulations
+          is a challenging and largely open problem. In this work, 
+          we build on equivariant physics-informed models to predict the leading term for this equation, called the dipole.
+          Our contributions present an important next step in the path towards computationally tractable, generalizable,
+          and scalable molecular property prediction.
+        </p>
+        <p>
+          A Graph Neural Network is one of the most suitable
+          architectures to represent molecular data, where a node corresponds to
+          an atom and an edge corresponds to a chemical bond. Because of this
+          structural alignment, GNNs are the primary model architecture used for
+          molecular property
+          prediction, organic retrosynthesis, and protein-ligand binding.
+          However, classic GNNs do not inherently guarantee one of
+          the central properties of molecules - rotational and translational
+          (SE(3)) equivariance.
         </p>
 
         <p>
           To address this limitation, a number of architectures with built-in
-          equivariance have been proposed such as SchNet, PaiNN, EGNN[<a href="#ref1">1</a>, <a href="#ref2">2</a>, <a href="#ref3">3</a>]. Despite
+          equivariance have been designed, such as PaiNN <a href="#ref1">[1]</a>, SchNet <a href="#ref2">[2]</a>, EGNN <a href="#ref3">[3]</a>. Despite
           achieving better performance and more meaningful and accurate physical
           representation, built-in equivariant GNNs are computationally
           expensive, especially when algorithms rely on spherical harmonics or
-          per-edge vector update [<a href="#ref4">4</a>, <a href="#ref5">5</a>].
+          per-edge vector updates <a href="#ref4">[4]</a>, <a href="#ref5">[5]</a>.
         </p>
 
         <p>
-          This raises an important question of effectiveness and design trade-off: 
-          Can a carefully designed non-equivariant GNN, trained on synthetically augmented data, 
-          learn equivariance and achieve similar results while requiring fewer computations? To investigate this
-          hypothesis, we designed a set of models to predict dipole moment of
-          small organic molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction is a suitable 
-          benchmark because it is a 3D vector quantity: as a molecule rotates, the output should rotate identically 
-          while retaining magnitude. Dipole moment is essential for determining charge distribution, which defines 
-          polarity and influences properties like membrane permeability and solubility. Knowing dipole moments 
-          can speed up polarity-based property estimation and helps avoid running computationally expensive Density 
-          Functional Theory (DFT), which is used for accurate dipole calculations. Dipole moments also enable 
-          generation of infrared (IR) spectra used for real-time reaction monitoring.
+          To investigate our
+          hypothesis, we designed a set of models to predict the dipole moment of
+          small molecules from QM7-X dataset <a href="#ref6">[6]</a>. Dipole moment prediction
+          is a particularly suitable benchmark as it is a
+          vector quantity; as a molecule gets rotated, the model output should rotate
+          in the same exact direction while retaining magnitude. The dipole moment is 
+          essential in determining how charge is spread out in a molecule, which 
+          defines polarity and influences properties like membrane permeability and 
+          solubility.  A high quality model can help avoid running computationally expensive Density 
+          Functional Theory (DFT) calculations and is key to predicting how a molecule will absorb infrared light.
         </p>
 
         <p>
@@ -459,9 +457,8 @@
         </p>
 
         <p>
-          We chose not to use models that rely on spherical harmonics, as they are more computationally 
-          expensive and RBF expansion is unnecessary for testing our hypothesis. To evaluate the 
-          effectiveness of learned equivariance, we compared three cases:
+          To evaluate the effectiveness of equivariance learning we
+          compared these three cases:
         </p>
 
         <ol>
@@ -471,16 +468,16 @@
           </li>
           <br />
           <li>
-            <b>Strawberry</b> – the same architecture as Vanilla, but 
-            trained on rotationally augmented data. We used Super-Fibonacci 
-            sampling to generate SO(3) augmentations of our training set <a href="#ref7">[7]</a>.
+            <b>Strawberry</b> – a standard, non-equivariant GNN with the same
+            architecture as Vanilla, but trained on rotationally augmented data.
+            We used Super-Fibonacci sampling to create SO(3) augmentations of our
+            train dataset <a href="#ref7">[7]</a>.
           </li>
           <br />
           <li>
-            <b>Chocolate</b> – our equivariant GNN based on EGNN <a href="#ref3">[3]</a> 
-            in which internal vector features are guaranteed to rotate with the input. It does 
-            not rely on spherical harmonics, which would substantially increase computational cost, 
-            but instead adds vector features to each node.
+            <b>Chocolate</b> – our equivariant GNN baseline based on EGNN [CITE EGNN] in which internal
+            vector features are guaranteed to rotate with rotations of the
+            input.
           </li>
         </ol>
         <div class="figure-wrapper">
@@ -860,7 +857,7 @@
           rotated as well as the input molecule as you can see above.
         </p>
       </div>
-      <div class="margin-right-block">EGNN outperformed most models, which was the reason we picked it as inspiration, as shown in <a href="#ref3">[3]</a></div>
+      <div class="margin-right-block"></div>
     </div>
     <div class="content-margin-container" id="related_works">
       <div class="margin-left-block"></div>
@@ -1315,13 +1312,31 @@
 
           <br />
 
-              <div class="equation">
-    v<sub>i</sub><sup>mix</sup>
-    =
-    v<sub>i</sub><sup>(l)</sup>
-    W<sub>mix</sub>
-  </div>
-
+            <div class="equation-container">
+              <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mtext>mix</mtext>
+                  </msubsup>
+                  <mo>=</mo>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mrow>
+                      <mo>(</mo>
+                      <mi>l</mi>
+                      <mo>)</mo>
+                    </mrow>
+                  </msubsup>
+                  <msub>
+                    <mi>W</mi>
+                    <mtext>mix</mtext>
+                  </msub>
+                </mrow>
+              </math>
+            </div>
 
           <li>And finally applies the updates:</li>
 
@@ -1880,15 +1895,34 @@
             Mixes the hidden channels of the vector features (applies a single
             linear layer):
           </li>
-
           <br />
 
-          <div class="equation">
-    v<sub>i</sub><sup>mix</sup>
-    =
-    v<sub>i</sub><sup>(l)</sup>
-    W<sub>mix</sub>
-  </div>
+              <div class="equation-container">
+              <math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mtext>mix</mtext>
+                  </msubsup>
+                  <mo>=</mo>
+                  <msubsup>
+                    <mi>𝐯</mi>
+                    <mi>i</mi>
+                    <mrow>
+                      <mo>(</mo>
+                      <mi>l</mi>
+                      <mo>)</mo>
+                    </mrow>
+                  </msubsup>
+                  <msub>
+                    <mi>W</mi>
+                    <mtext>mix</mtext>
+                  </msub>
+                </mrow>
+              </math>
+            </div>
+
 
           <br />
 
@@ -2013,7 +2047,7 @@
           Non-equivariant models with sufficient expressivity and information
           about geometry are known to be capable of learning equivariance. This
           both follows from universal approximation and has been
-          shown in applications. [<a href="#ref11">11</a>, <a href="#ref12">12</a>]. To evaluate
+          shown in applications. [<a href="#ref11">11</a>, <a href="#ref11">12</a>]. To evaluate
           whether Strawberry was able to converge to equivariance with normal,
           data-augmented, and our layerwise loss regimes, we calculated the
           equivariance error of the predicted dipoles and the latent vector
@@ -2032,9 +2066,13 @@
 				<h1>Results</h1>
 				
 				<p>
-					Implementing layerwise losses adds an equivariance regularizer for the non-equivariant model.
-					Data augmentation alone provides a soft objective in favor of equivariance. Here we analyze
-					compare Chocolate's performance to all three training schedules of Strawberry.
+					Our goal was to evaluate whether Strawberry, a non-equivariant GNN, could get approximate 
+          rotational equivariance through two mechanisms: rotational data augmentation and per-layer 
+          equivariance penalties. We compared these variants against Chocolate, a model with 
+          built-in equivariant architecture. The combined results suggest that while augmentation 
+          encourages some degree of equivariance, naïvely applying an MSE-based equivariance regularizer 
+          introduces optimization instabilities that degrade predictive accuracy. We evaluated all models on 
+          dipole prediction for the QM7-X test set:
 				</p>
 				<h3>RMSE Accuracy on Test Set</h3>
         <table class="booktabs">
@@ -2071,9 +2109,10 @@
           </tbody>
         </table>
 				<p>
-					The obtained RMSE was not state of the art, but the models did demonstrate some predictive ability.
-          We were surprised to see that the per-layer equivariance loss hurt the prediction RMSE, suggesting the simple MSE 
-	          regularizer may have encouraged latent collapse instead of learning equivariance.
+					While none of the models reached state-of-the-art performance, all models achieved some predictive accuracy.
+           As expected, Chocolate achieved the best RMSE, however, Vanilla performed surprisingly well relative to Strawberry with augmentation. 
+           We were surprised to see that the per-layer equivariance loss further degraded RMSE, 
+           suggesting that simple MSE regularizer may have encouraged latent collapse instead of learning equivariance.
 					</p>
 	    	</div>
 				<div class="margin-right-block"></div>
@@ -2084,11 +2123,28 @@
 				<div class="main-content-block">
 					<h3>Training Loss Curves</h3>
 					<p>
-						Training and validation loss trajectories for Chocolate and Strawberry under each regime. Strawberry with
-            augmentation and intermediate equivariance penalties converged more slowly and to a higher loss.  The
-            validation trajectories were also more chaotic than expected, even with implementation of learning rate
-            scheduling.  In the future, we will implement smaller batch sizes and train for more epochs with an even
-            lower learning rate.
+  Training and validation trajectories reveal how each training schedule affects optimization:
+</p>
+
+<ul>
+  <li>
+    <strong>Chocolate</strong> exhibits smooth convergence and low validation variance, consistent with the stability typically observed in equivariant architectures.
+  </li>
+  <li>
+    <strong>Strawberry (no augmentation)</strong> trains cleanly but underfits compared to Chocolate.
+  </li>
+  <li>
+    <strong>Strawberry + augmentation</strong> shows noisier validation curves, reflecting the harder learning task introduced by rotational variation.
+  </li>
+  <li>
+    <strong>Strawberry + augmentation + layerwise loss</strong> converges the slowest and plateaus at the highest loss. Even with learning-rate scheduling, the validation curves are notably chaotic.
+  </li>
+</ul>
+
+<p>
+  These patterns suggest that the intermediate per-layer losses significantly complicate optimization. A lower learning rate and longer training horizon, combined with smaller batches, may help stabilize training in future work.
+</p>
+
 					</p>
 					<img src="./images/loss_curves_grid.svg" width="512" />
 				</div>
@@ -2096,7 +2152,21 @@
 					Training/validation loss across augmentation and layerwise-loss schedules
 				</div>
 			</div>
-	
+
+			<div class="content-margin-container" style="align-items: flex-start;">
+				<div class="margin-left-block"></div>
+				<div class="main-content-block">
+					<h3>Predicted vs. True Dipoles</h3>
+					<p>
+						Scatter plots of predicted versus ground-truth dipole components (x, y, z stacked) for each model variant. The equivariant Chocolate model hugs the identity line; the layerwise regularizer worsens scatter.
+					</p>
+					<img src="./images/dipole_pred_vs_true_grid.png" width="512" />
+				</div>
+				<div class="margin-right-block">
+					2×2 grid: Vanilla, Strawberry+Aug, Strawberry+Aug+Layerwise, Chocolate
+				</div>
+			</div>
+		
 			<div class="content-margin-container">
 				<div class="margin-left-block"></div>
 				<div class="main-content-block">
@@ -2145,7 +2215,7 @@
           multiple seeds and training runs, giving us confidence that this phenomenon is not due to a specific
           hyperparameter choice.
 
-          We compared three models—Vanilla, Strawberry, and Chocolate—to
+          We compared three models - Vanilla, Strawberry, and Chocolate - to
           investigate whether a non-equivariant GNN trained with rotational
           augmentation can approximate the performance of a built-in equivariant
           architecture on vector-valued properties like dipole moments. Our
@@ -2163,12 +2233,13 @@
         <h1>Implications and limitations</h1>
 
         <p>
-          As one of the main limitations of the project we would highlight that
-          the hypothesis was only tested with a dataset that contains small
-          organic molecules. Although small organic molecules are important in
-          research, it is quite difficult to extrapolate our results to bigger
-          molecular systems such as RNA and proteins, which are central in drug
-          development field. 
+          Training models to approximately understand physics constraints through data augmentation and equivariance
+          regularization is an active area of research.  Our work demonstrates that geometric regularization of a 
+          model's latent representation can be implemented with very simple terms, customizable to any symmetry of
+          interest.  We also demonstrated, however, that these regularizations can be harmful to a model's quality when
+          a push towards a desired physical constraint is in local tension with the prediction task.  While not needing the
+          same amount of hard-coded structure as a hard imposition of equivariance upon a model, this tension must be
+          recognized and mitigated.
         </p>
       </div>
       <div class="margin-right-block"></div>
@@ -2233,7 +2304,7 @@ SO(3) Equivariant Local Frame GNNs. <i>arXiv preprint.</i>
     <a href="https://www.sciencedirect.com/science/article/pii/S0893608005801315" target="_blank">Leshno, M. et al. (1993).</a> Multilayer feedforward networks with a nonpolynomial activation function can approximate any function. 
     <i>Neural Networks.</i>
   </li>
-    <li id="ref12">
+  <li id="ref12">
     <a href="https://arxiv.org/abs/2006.16221" target="_blank">Finzi M., et al. (2021).</a> Approximate Equivariance Learning in Neural Networks.
     <i>Neural Networks.</i>
   </li>
